@@ -76,7 +76,7 @@ print('AWS service endpoints by region and IPv6 support')
 print('</h2>')
 
 print('<p>')
-print('AWS has 300+ distinct service APIs and 30+ regions. Over 6.000 of those combinations')
+print('AWS has 300+ distinct service APIs and 30+ regions. Over 6,000 of those combinations')
 print('are in service.')
 print('The following table shows each service API, per region, by IPv6 support status.')
 print('</p>')
