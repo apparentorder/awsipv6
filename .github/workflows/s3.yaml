@@ -22,7 +22,7 @@ jobs:
       - name: install stuff
         run: |
           npm install -D tailwindcss
-          sudo apt install -y python-dateutil
+          sudo apt install -y python3-dateutil
       - name: build beta
         run: |
           bash awsipv6-update.sh
