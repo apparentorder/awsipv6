@@ -50,7 +50,7 @@ if test -s "$changes_today"; then
     aws s3 cp "$changes" "$S3BASE"/changes
 fi
 
-python3 awsipv6-html.py $LIVE_ARG > output/endpoints.html
+python3 awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
 
 cp uglyshit.js  output/
 cp fonts.css  output/
