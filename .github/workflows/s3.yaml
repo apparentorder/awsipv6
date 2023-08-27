@@ -2,7 +2,7 @@ name: deploy to awsipv6 s3
 on:
   workflow_dispatch:
   schedule:
-    - cron: '15 13 * * *'
+    - cron: '42 3 * * *'
     
 permissions:
   id-token: write
