@@ -26,3 +26,6 @@ jobs:
       - name: build beta
         run: |
           bash awsipv6-update.sh
+      - name: build live
+        run: |
+          bash awsipv6-update.sh --live
