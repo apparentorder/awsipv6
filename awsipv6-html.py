@@ -303,7 +303,13 @@ The details:
 </div>
 
 <div id="footer">
-contact: <a href="https://twitter.com/apparentorder">@apparentorder</a> or <a href="mailto:apparentorder@neveragain.de">e-mail</a>.
+<p>
+Contact: <a href="https://twitter.com/apparentorder">@apparentorder</a> or
+<a href="mailto:apparentorder@neveragain.de">e-mail</a>.
+</p>
+<p>
+Sources are available on <a href="https://github.com/apparentorder/awsipv6">on Github</a>.
+</p>
 </div>
 </div>
 ''')
