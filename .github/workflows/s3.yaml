@@ -20,9 +20,9 @@ jobs:
           role-session-name: github-action-copy-s3
           aws-region: eu-central-1
       - name: install stuff
-        run:
+        run: |
           npm install -D tailwindcss
-          sudo install python-dateutil
+          sudo apt install -y python-dateutil
       - name: build beta
-        run:
+        run: |
           bash awsipv6-update.sh
