@@ -255,7 +255,7 @@ print('</div>') # main-content
 print('</div>') # everything
 
 print('<div id="changes" class="p-2 border-t space-y-2">')
-print('<h4 class="text-xl">Recent changes:</h4>')
+print('<h4 class="text-xl">Recent changes</h4>')
 
 print('<div id="changes-explain" class="text-sm">')
 print('Endpoints with a <code>+</code> have been added.<br>')
