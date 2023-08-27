@@ -288,13 +288,12 @@ print('''
 <div id="details">
 The details:
 <ul class="list-disc pl-6 text-xs max-w-prose">
-  <li>This list is generated from botocore's <code>_endpoint_data</code> and <code>endpoint_resolver.construct_endpoint()</code></li>
-  <li>Currently based on some recent botocore version, but not up to date with the latest botocore commits; this will change soon</li>
+  <li>This list is generated daily from botocore's <code>_endpoint_data</code> and <code>endpoint_resolver.construct_endpoint()</code></li>
   <li>IPv4 and IPv6 support is determined by DNS only (i.e. if an endpoint returns any AAAA records, it is considered IPv6-enabled)</li>
-  <li>endpoints marked as "deprecated" are not included</li>
+  <li>Endpoints marked as "deprecated" are not included</li>
   <li>AWS partitions that are marked as <code>_UNSUPPORTED_DUALSTACK_PARTITIONS</code> have been excluded.</li>
-  <li>non-regionalized services (that have only one partition-wide endpoint, i.e. IAM or Route53) are not properly supported yet</li>
-  <li>selection "Hide IPv4-only" may display services that are IPv6-enabled only in regions that are not currently selected</li>
+  <li>Non-regionalized services (that have only one partition-wide endpoint, i.e. IAM or Route53) are not properly supported yet</li>
+  <li>Selection "Hide IPv4-only" may display services that are IPv6-enabled only in regions that are not currently selected</li>
   <li>Percentages in the table at the top are based on the count of service-region endpoints that are actually available; that's more than 6.000 endpoints,
       btw, while the total number of service/region combinations is more than 9.000
   <li>Fun fact: In about 2/3 of regions, there isn't just <code>s3.$region.amazonaws.com</code>, but also a version with dash, <code>s3-$region.amazonaws.com</code>,
