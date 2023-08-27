@@ -1,12 +1,28 @@
 #!/usr/bin/env python3
 # should read "php" ...
 
-from Endpoints import ServiceEndpointsCollection
-
 import json
 import sys
 import re
 import html
+
+if len(sys.argv) < 2:
+    raise Exception("need botocore repo directory")
+    
+botocore_repo = sys.argv[1]
+
+use_test_data = not (len(sys.argv) == 3 and sys.argv[2] == "--live")
+
+sys.path.insert(0, f"{botocore_repo}")
+
+import botocore
+from Endpoints import ServiceEndpointsCollection
+
+# check for dummy tag to make sure we haven't accidentally imported the
+# system-provided botocore
+assert("awsipv6-git" in botocore.__version__)
+
+# ----------------------------------------------------------------------
 
 REGIONS_DISPLAY_DEFAULT = [
         # top regions, by services count,
@@ -25,8 +41,6 @@ REGIONS_DISPLAY_DEFAULT = [
         "cn-north-1",
         "us-gov-west-1",
 ]
-
-use_test_data = not (len(sys.argv) == 2 and sys.argv[1] == "--live")
 
 # ----------------------------------------------------------------------
 # load service data
