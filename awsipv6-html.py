@@ -11,7 +11,12 @@ if len(sys.argv) < 2:
     
 botocore_repo = sys.argv[1]
 
-use_test_data = not (len(sys.argv) == 3 and sys.argv[2] == "--live")
+use_test_data = True
+base_url = "https://awsipv6.s3.eu-central-1.amazonaws.com/beta"
+
+if len(sys.argv) == 3 and sys.argv[2] == "--live":
+    use_test_data = False
+    base_url = "https://awsipv6.neveragain.de"
 
 sys.path.insert(0, f"{botocore_repo}")
 
@@ -51,12 +56,19 @@ stats = sec.stats()
 # ----------------------------------------------------------------------
 # pass 3: output
 
-print('''
-<!doctype html>
+print('''<!doctype html>
 <html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="og:title" content="AWS service endpoints by region and IPv6 support">
+<meta name="description" content="A map to quickly identify which AWS services in your region support IPv6 by default and which require using a special dualstack endpoint">
+<meta property="og:description" content="A map to quickly identify which AWS services in your region support IPv6 by default and which require using a special dualstack endpoint">
+''')
+print(f'<meta property="og:image" content="{base_url}/og-image.png">')
+print('''
+<meta property="og:type" content="website">
 <link rel="stylesheet" href="uglyshit.css">
 <link rel="stylesheet" href="fonts.css">
 <title>AWS service endpoints by region and IPv6 support</title>

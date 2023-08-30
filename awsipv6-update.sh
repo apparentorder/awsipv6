@@ -52,8 +52,9 @@ fi
 
 python3 awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
 
-cp uglyshit.js  output/
-cp fonts.css  output/
+cp uglyshit.js output/
+cp fonts.css output/
+cp og-image.png output/
 npx tailwindcss -i uglyshit.css -o output/uglyshit.css
 
 aws s3 sync output/ "$S3BASE"/
