@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from botocore.regions import EndpointResolver
+import urllib
 import botocore.session
 import json
 import socket
@@ -8,8 +9,8 @@ import sys
 
 class ServiceEndpointsCollection:
     def __init__(self, use_test_data = False):
-        self._botocore_session = botocore.session.get_session()
-        self.botocore_endpoint_resolver = self._botocore_session.get_component('endpoint_resolver')
+        self.botocore_session = botocore.session.get_session()
+        self.botocore_endpoint_resolver = self.botocore_session.get_component('endpoint_resolver')
         self.botocore_endpoint_data = self.botocore_endpoint_resolver._endpoint_data
 
         self.endpoints = []
@@ -20,7 +21,7 @@ class ServiceEndpointsCollection:
             return
 
         self.all_regions = {}
-        self.all_services = set()
+        self.all_services = self.botocore_session.get_available_services()
 
         for partition_data in self.botocore_endpoint_data['partitions']:
             if partition_data['partition'] in self.botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS:
@@ -29,9 +30,6 @@ class ServiceEndpointsCollection:
             for region_key, region_data in partition_data['regions'].items():
                 self.all_regions[region_key] = region_data
                 self.all_regions[region_key]['partition'] = partition_data['partition']
-
-            for service_name, _ in partition_data['services'].items():
-                self.all_services.add(service_name)
 
     def _use_test_data(self):
         self.all_regions = {
@@ -51,11 +49,23 @@ class ServiceEndpointsCollection:
                 "description": "ilc1",
                 "partition": "aws",
             },
+            "cn-north-1": {
+                "description": "cnn1",
+                "partition": "aws-cn",
+            },
         }
 
-        self.all_services = set(["elasticbeanstalk", "firehose", "secretsmanager", "ec2", "iam", "amplify",
-            "rds",
-            "health"])
+        self.all_services = [
+            'bedrock',
+            'acm',
+            'es',
+            'detective',
+            'ebs',
+            'ec2',
+            'secretsmanager',
+            'firehose',
+            'servicediscovery'
+         ]
 
     def stats(self):
         # note: SEPs that are not present (service not supported in a region) do not count.
@@ -92,7 +102,7 @@ class ServiceEndpointsCollection:
             service_name = service_name,
             partition_name = partition_name,
             region_name = region_name,
-            endpoint_resolver = self.botocore_endpoint_resolver
+            botocore_session = self.botocore_session
         )
 
         self.endpoints += [sep]
@@ -174,7 +184,7 @@ class Endpoint:
             pass
 
 class ServiceEndpoints:
-    def __init__(self, service_name, partition_name, region_name, endpoint_resolver, loaded = False):
+    def __init__(self, service_name, partition_name, region_name, botocore_session, loaded = False):
         self.partition = partition_name
         self.service_name = service_name
         self.partition_name = partition_name
@@ -186,34 +196,30 @@ class ServiceEndpoints:
         if loaded:
             return
 
-        aws_endpoint_default = endpoint_resolver.construct_endpoint(
+        # XXX: unfortunately, get_available_regions() works correctly for most services,
+        #      but fails for some services (e.g. for 'bedrock' it returns an empty list)
+        #if region_name not in botocore_session.get_available_regions(service_name, partition_name, allow_non_regional=True):
+        #    self.endpoint_default = Endpoint(None)
+        #    self.endpoint_dualstack = Endpoint(None)
+        #    return
+        
+        aws_client_default = botocore_session.create_client(
             service_name,
             region_name,
-            partition_name,
-            use_dualstack_endpoint = False
+            config = botocore.config.Config(),
         )
 
-        if aws_endpoint_default.get('deprecated'):
-            # we're not handling those endpoints
-            self.deprecated = True
-            self.endpoint_default = Endpoint(None)
-            self.endpoint_dualstack = Endpoint(None)
-            return
+        hostname_default = urllib.parse.urlparse(aws_client_default.meta._endpoint_url).netloc
+        self.endpoint_default = Endpoint(hostname_default)
+        
+        aws_client_dualstack = botocore_session.create_client(
+            service_name,
+            region_name,
+            config = botocore.config.Config(use_dualstack_endpoint = True),
+        )
 
-        self.endpoint_default = Endpoint(aws_endpoint_default.get('hostname'))
-
-        try:
-            aws_endpoint_dualstack = endpoint_resolver.construct_endpoint(
-                service_name,
-                region_name,
-                partition_name,
-                use_dualstack_endpoint = True
-            )
-
-            self.endpoint_dualstack = Endpoint(aws_endpoint_dualstack.get('hostname'))
-
-        except botocore.exceptions.EndpointVariantError:
-            pass
+        hostname_dualstack = urllib.parse.urlparse(aws_client_dualstack.meta._endpoint_url).netloc
+        self.endpoint_dualstack = Endpoint(hostname_dualstack)
 
     @staticmethod
     def from_data(data):
@@ -221,7 +227,7 @@ class ServiceEndpoints:
             service_name = data['service'],
             partition_name = data['partition'],
             region_name = data['region'],
-            endpoint_resolver = None,
+            botocore_session = None,
             loaded = True
         )
 
@@ -240,4 +246,3 @@ class ServiceEndpoints:
         }
 
         return r
-
