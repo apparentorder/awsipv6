@@ -198,6 +198,7 @@ class ServiceEndpoints:
 
         # XXX: unfortunately, get_available_regions() works correctly for most services,
         #      but fails for some services (e.g. for 'bedrock' it returns an empty list)
+        #      https://github.com/boto/botocore/issues/3028
         #if region_name not in botocore_session.get_available_regions(service_name, partition_name, allow_non_regional=True):
         #    self.endpoint_default = Endpoint(None)
         #    self.endpoint_dualstack = Endpoint(None)
