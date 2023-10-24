@@ -301,7 +301,7 @@ print('''
 <div id="details">
 The details:
 <ul class="list-disc pl-6 text-xs max-w-prose">
-  <li>This list is generated daily from botocore's <code>_endpoint_data</code>, <code>get_available_services()</code> and <code>create_client()</code></li>
+  <li>This list is generated almost daily (Tue - Sat) from botocore's <code>_endpoint_data</code>, <code>get_available_services()</code> and <code>create_client()</code></li>
   <li>IPv4 and IPv6 support is determined by DNS only (i.e. if an endpoint returns any AAAA records, it is considered IPv6-enabled)</li>
   <li>AWS partitions that are marked as <code>_UNSUPPORTED_DUALSTACK_PARTITIONS</code> have been excluded.</li>
   <li>Non-regionalized services (that have only one partition-wide endpoint, i.e. IAM or Route53) are not properly supported yet</li>
