@@ -27,7 +27,7 @@ python3 awsipv6-get.py "$BOTOCORE_REPO" $LIVE_ARG
 changes="output/changes"
 changes_today=$(mktemp /tmp/awsipv6-changes_today.XXXXXX)
 text_prev=$(mktemp /tmp/awsipv6-text_prev.XXXXXX)
-trap "rm -f $changes_today $text_prev" SIGINT SIGTERM EXIT
+trap "rm -f $changes_today $text_prev" INT TERM EXIT
 
 today=$(date +%Y-%m-%d)
 
