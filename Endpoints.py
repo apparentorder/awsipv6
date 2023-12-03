@@ -3,6 +3,7 @@
 from botocore.regions import EndpointResolver
 import urllib
 import botocore.session
+import botocore.exceptions
 import json
 import socket
 import sys
@@ -21,7 +22,15 @@ class ServiceEndpointsCollection:
             return
 
         self.all_regions = {}
-        self.all_services = self.botocore_session.get_available_services()
+        
+        # some services require additional parameters that are not known to us.
+        # no option but to blacklist those services
+        self.service_blacklist = {
+            "cloudfront-keyvaluestore": "KVS ARN must be provided to use this service",
+            "s3control": "ParamValidationError: Parameter validation failed: AccountId is required but not set",
+        }
+
+        self.all_services = set(self.botocore_session.get_available_services()) - set(self.service_blacklist.keys())
 
         for partition_data in self.botocore_endpoint_data['partitions']:
             if partition_data['partition'] in self.botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS:
@@ -58,13 +67,17 @@ class ServiceEndpointsCollection:
         self.all_services = [
             'bedrock',
             'acm',
-            'es',
+            'sts',
+            'opensearch',
             'detective',
             'ebs',
             'ec2',
+            'iam',
             'secretsmanager',
             'firehose',
-            'servicediscovery'
+            'servicediscovery',
+            'freetier',
+            'eks-auth',
          ]
 
     def stats(self):
@@ -189,39 +202,74 @@ class ServiceEndpoints:
         self.service_name = service_name
         self.partition_name = partition_name
         self.region_name = region_name
+        self.botocore_session = botocore_session
         self.endpoint_default = None
         self.endpoint_dualstack = None
         self.deprecated = False
+        self.config_default = botocore.config.Config(defaults_mode = 'standard')
+        self.config_dualstack = botocore.config.Config(defaults_mode = 'standard', use_dualstack_endpoint = True)
 
         if loaded:
             return
-
-        # XXX: unfortunately, get_available_regions() works correctly for most services,
-        #      but fails for some services (e.g. for 'bedrock' it returns an empty list)
-        #      https://github.com/boto/botocore/issues/3028
-        #if region_name not in botocore_session.get_available_regions(service_name, partition_name, allow_non_regional=True):
-        #    self.endpoint_default = Endpoint(None)
-        #    self.endpoint_dualstack = Endpoint(None)
-        #    return
         
-        aws_client_default = botocore_session.create_client(
-            service_name,
-            region_name,
-            config = botocore.config.Config(),
-        )
-
-        hostname_default = urllib.parse.urlparse(aws_client_default.meta._endpoint_url).netloc
+        # XXX: unfortunately, get_available_regions() works correctly for most services,
+        #      but fails for some services (e.g. for 'bedrock' or 'eks-auth' it returns
+        #      an empty list)  --  https://github.com/boto/botocore/issues/3028
+        #      we therefore only use it when it actually returns something.
+        service_regions = self.botocore_session.get_available_regions(service_name, partition_name)
+        
+        if len(service_regions) > 0 and region_name not in service_regions:
+            self.endpoint_default = Endpoint(None)
+            self.endpoint_dualstack = Endpoint(None)
+            return
+        
+        hostname_default = self._resolve_service_endpoint(service_name, region_name, config = self.config_default)
+        hostname_dualstack = self._resolve_service_endpoint(service_name, region_name, config = self.config_dualstack)
+        
         self.endpoint_default = Endpoint(hostname_default)
         
-        aws_client_dualstack = botocore_session.create_client(
+        if hostname_dualstack != hostname_default:
+            self.endpoint_dualstack = Endpoint(hostname_dualstack)
+        else:
+            # for services that use the same endpoint for "dualstack", or don't
+            # support any separate dualstack endpoint at all, don't list the
+            # dualstack endpoint separately.
+            self.endpoint_dualstack = Endpoint(None)
+
+    def _resolve_service_endpoint(self, service_name, region_name, config = None):
+        aws_client = self.botocore_session.create_client(
             service_name,
-            region_name,
-            config = botocore.config.Config(use_dualstack_endpoint = True),
+            region_name = region_name,
+            config = config,
         )
 
-        hostname_dualstack = urllib.parse.urlparse(aws_client_dualstack.meta._endpoint_url).netloc
-        self.endpoint_dualstack = Endpoint(hostname_dualstack)
+        # proper usage of botocore's newer EndpointRulesetResolver infrastructure
+        # is tied to a single operation (an OperationModel); for our purposes, it
+        # doesn't matter which operation we pick, we just need to pick one.
+        some_operation_name = list(aws_client._service_model._service_description['operations'].keys())[0]
+        operation_model = aws_client._service_model.operation_model(some_operation_name)
+        
+        # the rest of this is based on botocore/client.py, BaseClient._make_api_call()
+        request_context = {
+            'client_region': aws_client.meta.region_name,
+            'client_config': aws_client.meta.config,
+            'has_streaming_input': operation_model.has_streaming_input,
+            'auth_type': operation_model.auth_type,
+        }
 
+        try:
+            result = aws_client._resolve_endpoint_ruleset(
+                operation_model,
+                {}, # api_params (we don't need those)
+                request_context = request_context
+            )
+            
+            return urllib.parse.urlparse(result[0]).netloc
+            
+        except Exception as e:
+            print(f"ERROR:  Resolving for service {service_name} in region {region_name}: {e}")
+            return None
+        
     @staticmethod
     def from_data(data):
         sep = ServiceEndpoints(
