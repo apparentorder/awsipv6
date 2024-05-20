@@ -101,7 +101,7 @@ print('</p>')
 
 print('<p class="font-light">')
 print('<strong>IPv4-only services are hidden by default.</strong>')
-print('Hover to see an endpoint's address. Data is available as JSON <a href="endpoints.json">here</a>.')
+print('Hover to see a endpoint addresses. Data is available as JSON <a href="endpoints.json">here</a>.')
 print('</p>')
 
 print('</div>') # intro-text
