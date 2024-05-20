@@ -94,15 +94,14 @@ print('The following table shows each service API, per region, by IPv6 support s
 print('</p>')
 print('<p class="font-light">')
 print('IPv6-support <strong>by default</strong> will "just work" (e.g. from an IPv6-only VPC).')
-print('A <strong>dualstack endpoint</strong> supports IPv6, but requires')
-print('<a href="https://docs.aws.amazon.com/sdkref/latest/guide/feature-endpoints.html">explicit configuration</a>')
-print('of the AWS CLI / SDK to use it.')
-print('<strong>IPv4-only services are hidden by default.</strong>')
+print('A <strong>dualstack endpoint</strong> supports IPv6, but requires additional configuration.')
+print('See this <a href="https://tty.neveragain.de/2024/05/20/aws-ipv6-egress.html">blog post</a>')
+print('for details.')
 print('</p>')
 
 print('<p class="font-light">')
-print('Hover over any endpoint in the table to see its address. The underlying json data is available <a href="endpoints.json">here</a>.')
-print('View on desktop if possible.')
+print('<strong>IPv4-only services are hidden by default.</strong>')
+print('Hover to see an endpoint's address. Data is available as JSON <a href="endpoints.json">here</a>.')
 print('</p>')
 
 print('</div>') # intro-text
