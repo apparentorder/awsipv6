@@ -32,6 +32,16 @@ class ServiceEndpointsCollection:
 
         self.all_services = set(self.botocore_session.get_available_services()) - set(self.service_blacklist.keys())
 
+        # XXX: 2024-05-30: for all(?) services using the eu-isoe-west-1 region name -- including those that usually *do* have a dualstack
+        # endpoint --, botocore throws an exception:
+        #
+        #     botocore.exceptions.EndpointVariantError: Unable to construct a modeled endpoint with the following variant(s) ['dualstack']:
+        #
+        # We will assume that this partition does not support dualstack at all and that it should have been flagged accordingly.
+        # Revisit this in due time.
+        #
+        self.botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS += ["aws-iso-e"]
+
         for partition_data in self.botocore_endpoint_data['partitions']:
             if partition_data['partition'] in self.botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS:
                 continue
@@ -61,6 +71,10 @@ class ServiceEndpointsCollection:
             "cn-north-1": {
                 "description": "cnn1",
                 "partition": "aws-cn",
+            },
+            "eu-isoe-west-1": {
+                "description": "euiso",
+                "partition": "aws-iso-e",
             },
         }
 
@@ -237,11 +251,16 @@ class ServiceEndpoints:
             self.endpoint_dualstack = Endpoint(None)
 
     def _resolve_service_endpoint(self, service_name, region_name, config = None):
-        aws_client = self.botocore_session.create_client(
-            service_name,
-            region_name = region_name,
-            config = config,
-        )
+        try:
+            aws_client = self.botocore_session.create_client(
+                service_name,
+                region_name = region_name,
+                config = config,
+            )
+
+        except botocore.exceptions.EndpointVariantError as e:
+            print(f"WARNING:  Resolving {service_name} in {region_name}: {e}")
+            return None
 
         # proper usage of botocore's newer EndpointRulesetResolver infrastructure
         # is tied to a single operation (an OperationModel); for our purposes, it
