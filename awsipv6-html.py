@@ -159,7 +159,7 @@ if True: # settings
     for region_key in sorted(sec.all_regions.keys()):
         partition_name = sec.all_regions[region_key]['partition']
         region_description = sec.all_regions[region_key]['description']
-        region_description = re.sub('.*\((.*)\).*', '\\1', region_description)
+        region_description = re.sub(r'.*\((.*)\).*', '\\1', region_description)
         checked = "checked" if region_key in REGIONS_DISPLAY_DEFAULT else ""
         print(f'<div class="region-selection text-xs"><label>')
         #print(f'<div>')
@@ -277,7 +277,7 @@ print('</div>')
 with open("output/changes") as f:
     data_tags_open = False
     for line in f.readlines():
-        if re.match('^\d', line):
+        if re.match(r'^\d', line):
             if data_tags_open:
                 print('</ul>')
                 data_tags_open = False
