@@ -23,7 +23,7 @@ jobs:
           aws-region: eu-central-1
       - name: install stuff
         run: |
-          npm install -D tailwindcss
+          npm install -D tailwindcss@^4.0.0 @tailwindcss/cli@^4.0.0
       - name: build beta
         run: |
           bash awsipv6-update.sh
