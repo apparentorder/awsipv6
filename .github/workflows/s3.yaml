@@ -24,7 +24,6 @@ jobs:
       - name: install stuff
         run: |
           npm install -D tailwindcss
-          sudo apt install -y python3-{dateutil,jmespath}
       - name: build beta
         run: |
           bash awsipv6-update.sh
