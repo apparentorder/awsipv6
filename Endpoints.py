@@ -79,19 +79,11 @@ class ServiceEndpointsCollection:
         }
 
         self.all_services = [
-            'bedrock',
-            'acm',
+            'apigateway',
             'sts',
-            'opensearch',
-            'detective',
-            'ebs',
             'ec2',
             'iam',
             'secretsmanager',
-            'firehose',
-            'servicediscovery',
-            'freetier',
-            'eks-auth',
          ]
 
     def stats(self):
