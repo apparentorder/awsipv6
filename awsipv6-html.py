@@ -309,6 +309,9 @@ The details:
       btw, while the total number of service/region combinations is more than 9.000</li>
   <li>Fun fact: In about 2/3 of regions, there isn't just <code>s3.$region.amazonaws.com</code>, but also a version with dash, <code>s3-$region.amazonaws.com</code>,
       and that also works. Reasons unknown.</li>
+  <li>The China regions' DNS resolution has been unreliable for years, at least from both AWS eu-central-1 and Github runners, so their
+      entries might occasionally "flicker" in the data; this affects about a handful of endpoints per week or so. All entries
+      with <code>amazonwebservices.com.cn</code> names are therefore excluded when generating the list of recent changes.</li>
 </ul>
 </div>
 

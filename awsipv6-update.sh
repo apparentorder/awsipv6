@@ -34,7 +34,12 @@ today=$(date +%Y-%m-%d)
 aws s3 cp "$S3BASE"/changes "$changes"
 aws s3 cp "$S3BASE"/endpoints.text "$text_prev"
 
-diff -wu0 "$text_prev" output/endpoints.text > "$changes_today" || true
+diff -wu0 \
+    "$text_prev" \
+    output/endpoints.text \
+    | grep -v 'amazonwebservices.com.cn ' \
+    > "$changes_today" \
+|| true
 
 if test -s "$changes_today"; then
     # write complete history to changes_today, beginning with today's changes
