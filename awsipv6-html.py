@@ -200,7 +200,7 @@ print("<th>Service</th>")
 for region_key in sorted(sec.all_regions.keys()):
     partition_name = sec.all_regions[region_key]['partition']
     display = "display:none" if region_key not in REGIONS_DISPLAY_DEFAULT else ""
-    print(f'<th style="{display}" class="data-region-{partition_name}-{region_key} border-r">{region_key}</th>')
+    print(f'<th style="{display}" class="data-region-{partition_name}-{region_key} p-1 border-r">{region_key}</th>')
 print("</tr>")
 print('</thead>')
 print('<tbody>')
