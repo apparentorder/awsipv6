@@ -1,4 +1,9 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@theme {
+  --font-*: initial;
+  --font-sans: Amazon Ember;
+}
 
 .endpoint-nx {
   @apply bg-slate-300;
@@ -29,5 +34,5 @@ a {
 }
 
 code {
-  @apply pl-0.5 pr-0.5 bg-gray-100 rounded;
+  @apply pl-0.5 pr-0.5 bg-gray-100 rounded-sm;
 }
