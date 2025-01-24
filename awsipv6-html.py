@@ -135,8 +135,7 @@ print('</div>') # intro-and-stats
 
 print('<div id="everything" class="border-t flex">')
 
-#print('<div id="settings" class="p-7 w-1/4 space-y-4 bg-blue-300">')
-print('<div id="settings" class="p-4 w-300 space-y-4 bg-gray-100 border-r-2">')
+print('<div id="settings" class="p-4 w-64 flex-initial space-y-4 bg-gray-100 border-r-2">')
 if True: # settings
     print('<strong>Filter services:</strong>')
     print('<div id="filter-services">')
@@ -180,8 +179,7 @@ if True: # settings
 print('</div>') # settings/sidebar
 
 
-#print('<div id="main-content" class="p-4 w-full text-sm">')
-print('<div id="main-content" class="p-2 w-full text-xs">')
+print('<div id="main-content" class="p-2 flex-auto text-xs">')
 print('''
 <div class="flex flex-col">
   <div class="">
