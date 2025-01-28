@@ -22,7 +22,7 @@ else
     ( cd "$BOTOCORE_REPO" && git pull )
 fi
 
-python3 awsipv6-get.py "$BOTOCORE_REPO" $LIVE_ARG
+python3 -u awsipv6-get.py "$BOTOCORE_REPO" $LIVE_ARG
 
 changes_output="output/changes"
 changes_prev=$(mktemp /tmp/awsipv6-changes_prev.XXXXXX)
@@ -49,7 +49,7 @@ if test -s "$changes_today"; then
 fi
 cat "$changes_prev" >> "$changes_output"
 
-python3 awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
+python3 -u awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
 
 cp uglyshit.js output/
 cp fonts.css output/
