@@ -42,10 +42,12 @@ diff -wu0 "$endpoints_text_prev" output/endpoints.text \
     > "$changes_today" \
     || true
 
+: > "$changes_output"
 if test -s "$changes_today"; then
-    echo "$today" > "$changes_output"
-    cat "$changes_today" "$changes_prev" >> "$changes_output"
+    echo "$today" >> "$changes_output"
+    cat "$changes_today" >> "$changes_output"
 fi
+cat "$changes_prev" >> "$changes_output"
 
 python3 awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
 
