@@ -20,6 +20,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::329261680777:role/awsipv6-github
           role-session-name: github-action-copy-s3
+          role-duration-seconds: 14400
           aws-region: eu-central-1
       - name: install stuff
         run: |
