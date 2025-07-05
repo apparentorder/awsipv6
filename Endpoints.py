@@ -6,7 +6,6 @@ import botocore.session
 import botocore.exceptions
 import json
 import socket
-import sys
 
 class ServiceEndpointsCollection:
     def __init__(self, use_test_data = False):
