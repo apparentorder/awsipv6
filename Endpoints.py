@@ -71,10 +71,6 @@ class ServiceEndpointsCollection:
                 "description": "cnn1",
                 "partition": "aws-cn",
             },
-            "eu-isoe-west-1": {
-                "description": "euiso",
-                "partition": "aws-iso-e",
-            },
         }
 
         self.all_services = [
