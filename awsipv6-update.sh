@@ -17,7 +17,7 @@ fi
 
 if ! test -d "$BOTOCORE_REPO"; then
     git clone -b master https://github.com/boto/botocore.git "$BOTOCORE_REPO"
-    sed -i "s/^__version__ = '/__version__ = 'awsipv6-git-/" "$BOTOCORE_REPO/botocore/__init__.py"
+    sed -i.orig "s/^__version__ = '/__version__ = 'awsipv6-git-/" "$BOTOCORE_REPO/botocore/__init__.py"
 else
     ( cd "$BOTOCORE_REPO" && git pull )
 fi
