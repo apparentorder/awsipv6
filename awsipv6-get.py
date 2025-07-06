@@ -3,13 +3,13 @@
 import json
 import sys
 import subprocess
-    
+
 # ----------------------------------------------------------------------
 # take care of importing botocore from a git clone
 
 if len(sys.argv) < 2:
     raise Exception("need botocore repo directory")
-    
+
 botocore_repo = sys.argv[1]
 
 use_test_data = True
@@ -54,4 +54,4 @@ for sep in sec.endpoints:
 
 with open(f"output/endpoints.text", "w") as text_file:
     for ep in sorted(all_endpoints_text):
-        print(f"{ep}", file = text_file) 
+        print(f"{ep}", file = text_file)
