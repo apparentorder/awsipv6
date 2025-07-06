@@ -21,7 +21,7 @@ class ServiceEndpointsCollection:
             return
 
         self.all_regions = {}
-        
+
         # some services require additional parameters that are not known to us.
         # no option but to blacklist those services
         self.service_blacklist = {
@@ -92,7 +92,7 @@ class ServiceEndpointsCollection:
         se_count_ipv6_dualstack = 0
         se_count_ipv4_only = 0
         se_count_nx = 0
-        
+
         for sep in self.endpoints:
             if not sep.endpoint_default.hostname and not sep.endpoint_dualstack.hostname:
                 se_count_nx += 1
@@ -105,7 +105,7 @@ class ServiceEndpointsCollection:
             else:
                 se_count += 1
                 se_count_ipv4_only += 1
-                
+
         return {
             "count_total": se_count + se_count_nx,
             "count_enabled": se_count,
@@ -114,7 +114,7 @@ class ServiceEndpointsCollection:
             "count_ipv4_only": se_count_ipv4_only,
             "count_nx": se_count_nx,
         }
-        
+
     def add(self, service_name, partition_name, region_name):
         sep = ServiceEndpoints(
             service_name = service_name,
@@ -216,23 +216,23 @@ class ServiceEndpoints:
 
         if loaded:
             return
-        
+
         # XXX: unfortunately, get_available_regions() works correctly for most services,
         #      but fails for some services (e.g. for 'bedrock' or 'eks-auth' it returns
         #      an empty list)  --  https://github.com/boto/botocore/issues/3028
         #      we therefore only use it when it actually returns something.
         service_regions = self.botocore_session.get_available_regions(service_name, partition_name)
-        
+
         if len(service_regions) > 0 and region_name not in service_regions:
             self.endpoint_default = Endpoint(None)
             self.endpoint_dualstack = Endpoint(None)
             return
-        
+
         hostname_default = self._resolve_service_endpoint(service_name, region_name, config = self.config_default)
         hostname_dualstack = self._resolve_service_endpoint(service_name, region_name, config = self.config_dualstack)
-        
+
         self.endpoint_default = Endpoint(hostname_default)
-        
+
         if hostname_dualstack != hostname_default:
             self.endpoint_dualstack = Endpoint(hostname_dualstack)
         else:
@@ -258,7 +258,7 @@ class ServiceEndpoints:
         # doesn't matter which operation we pick, we just need to pick one.
         some_operation_name = list(aws_client._service_model._service_description['operations'].keys())[0]
         operation_model = aws_client._service_model.operation_model(some_operation_name)
-        
+
         # the rest of this is based on botocore/client.py, BaseClient._make_api_call()
         request_context = {
             'client_region': aws_client.meta.region_name,
@@ -273,13 +273,13 @@ class ServiceEndpoints:
                 {}, # api_params (we don't need those)
                 request_context = request_context
             )
-            
+
             return urllib.parse.urlparse(result[0]).netloc
-            
+
         except Exception as e:
             print(f"ERROR:  Resolving for service {service_name} in region {region_name}: {e}")
             return None
-        
+
     @staticmethod
     def from_data(data):
         sep = ServiceEndpoints(
