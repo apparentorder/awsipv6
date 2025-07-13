@@ -8,6 +8,7 @@ __pycache__
 .pydep
 .venv
 *.egg-info
+web/src/.generated-endpoint-changes.text
 
 # CDK asset staging directory
 .cdk.staging
