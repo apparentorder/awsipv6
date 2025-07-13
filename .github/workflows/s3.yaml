@@ -30,8 +30,10 @@ jobs:
           pip install psycopg-binary
       - name: build beta
         run: |
+          source .venv/bin/activate
           bash awsipv6-update.sh
       - name: build live
         run: |
+          source .venv/bin/activate
           bash awsipv6-update.sh --live
 
