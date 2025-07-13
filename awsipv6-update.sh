@@ -8,6 +8,7 @@ CDK_DSQL_STACK_NAME="Awsipv6BetaStack"
 CDK_STACK_TO_DEPLOY="Awsipv6BetaStack"
 LIVE_ARG=""
 SKIP_GET=0
+export AWS_DEFAULT_REGION=eu-west-1
 
 if test "$1" = "--live"; then
     S3BASE="s3://awsipv6"
@@ -85,4 +86,4 @@ pip install \
     --only-binary=:all: \
     psycopg-binary
 
-cdk deploy $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
+npx cdk deploy $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
