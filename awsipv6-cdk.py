@@ -182,6 +182,9 @@ class Awsipv6Stack(cdk.Stack):
         cdk.CfnOutput(self, "DsqlClusterEndpoint", value = dsql_endpoint)
 
 class Awsipv6BetaStack(cdk.Stack):
+    # This duplicates a lot (usually: all) of the Live stack's code, but this seemed more
+    # reasonable than hacking around each time only the Beta version should be modified.
+
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
