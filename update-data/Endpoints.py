@@ -31,15 +31,19 @@ class ServiceEndpointsCollection:
 
         self.all_services = set(self.botocore_session.get_available_services()) - set(self.service_blacklist.keys())
 
-        # XXX: 2024-05-30: for all(?) services using the eu-isoe-west-1 region name -- including those that usually *do* have a dualstack
+        # XXX: 2024-05-30: for some(?) "iso" regions, for all(?) services name -- including those that usually *do* have a dualstack
         # endpoint --, botocore throws an exception:
         #
         #     botocore.exceptions.EndpointVariantError: Unable to construct a modeled endpoint with the following variant(s) ['dualstack']:
         #
-        # We will assume that this partition does not support dualstack at all and that it should have been flagged accordingly.
+        # Regions observed so far: eu-isoe-west-1 (2024-05-30), us-isof-east-1, us-isof-south-1, eusc-de-east-1 (all 2025-07-13).
+        #
+        # We will assume that these partitions do not support dualstack at all and should have been flagged accordingly.
+        # Exception: EU Sovereign Cloud (eusc), which will be an additional public commercial partition and deserves visibility.
+        #
         # Revisit this in due time.
         #
-        self.botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS += ["aws-iso-e"]
+        self.botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS += ["aws-iso-e", "aws-iso-f"]
 
         for partition_data in self.botocore_endpoint_data['partitions']:
             if partition_data['partition'] in self.botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS:
