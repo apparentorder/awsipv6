@@ -66,6 +66,7 @@ def get_stats(event):
             SUM(CASE WHEN endpoint_dualstack_has_ipv6 AND NOT endpoint_default_has_ipv6 THEN 1 ELSE 0 END) AS count_ipv6_dualstack,
             SUM(CASE WHEN NOT endpoint_default_has_ipv6 AND NOT endpoint_dualstack_has_ipv6 THEN 1 ELSE 0 END) AS count_ipv4_only
         FROM endpoint
+        WHERE endpoint_default_hostname IS NOT NULL
     """
 
     stats_row = dsql_execute(stats_query).fetchone()
@@ -112,6 +113,7 @@ def get_table_data(event, region_list_from_user, html_only = False):
         SELECT *
         FROM endpoint
         WHERE region_name = ANY(%s)
+        AND (endpoint_default_hostname IS NOT NULL OR endpoint_dualstack_hostname IS NOT NULL)
     """
     query_parameters = [region_list_from_user]
 
@@ -395,9 +397,13 @@ def get_main(event, region_list_from_user):
                             </div>
                             <div id="region-checkboxes" class="hidden">
                                 <div class="pb-2 flex-row">
+                                    <!--
+                                        The "Select all" button isn't useful on Live, as it explodes the Lambda
+                                        payload limit when selecting all endpoints. Hide it.
+                                    -->
                                     <button
                                         type="button"
-                                        class="rounded bg-white border-1 text-sm"
+                                        class="rounded bg-white border-1 text-sm hidden"
                                         onclick="setAllRegionsChecked(true)"
                                     >
                                         <span class="mx-2">Select all</span>
