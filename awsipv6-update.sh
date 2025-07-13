@@ -86,4 +86,4 @@ pip install \
     --only-binary=:all: \
     psycopg-binary
 
-cdk deploy $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
+npx cdk deploy $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
