@@ -27,7 +27,7 @@ jobs:
           npm install
           python3 -m venv .venv
           source .venv/bin/activate
-          pip install -r udpate-data/requirements.txt
+          pip install -r update-data/requirements.txt
       - name: build beta
         run: |
           source .venv/bin/activate
