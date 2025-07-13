@@ -4,11 +4,22 @@ set -e
 
 BOTOCORE_REPO=~/environment/botocore
 S3BASE="s3://awsipv6/beta"
+CDK_DSQL_STACK_NAME="Awsipv6BetaStack"
+CDK_STACK_TO_DEPLOY="Awsipv6BetaStack"
 LIVE_ARG=""
+SKIP_GET=0
 
 if test "$1" = "--live"; then
     S3BASE="s3://awsipv6"
     LIVE_ARG="--live"
+    CDK_DSQL_STACK_NAME="Awsipv6Stack"
+    CDK_STACK_TO_DEPLOY="--all"
+    shift
+fi
+
+if test "$1" = "--skip-get"; then
+    SKIP_GET=1
+    shift
 fi
 
 if ! test -d output; then
@@ -22,7 +33,13 @@ else
     ( cd "$BOTOCORE_REPO" && git pull )
 fi
 
-python3 -u awsipv6-get.py "$BOTOCORE_REPO" $LIVE_ARG
+if test "$SKIP_GET" -ne 1; then
+    export DSQL_ENDPOINT=$(
+        aws cloudformation describe-stacks --stack-name "$CDK_DSQL_STACK_NAME" \
+        | jq -j '.Stacks[].Outputs[] | select(.OutputKey == "DsqlClusterEndpoint") | .OutputValue'
+    )
+    python3 -u update-data/awsipv6-get.py "$BOTOCORE_REPO" $LIVE_ARG
+fi
 
 changes_output="output/changes"
 changes_prev=$(mktemp /tmp/awsipv6-changes_prev.XXXXXX)
@@ -38,6 +55,7 @@ aws s3 cp "$S3BASE"/endpoints.text "$endpoints_text_prev"
 diff -wu0 "$endpoints_text_prev" output/endpoints.text \
     | sed 1,2d \
     | grep -v 'amazonwebservices.com.cn ' \
+    | grep -v 'amazonaws.com.cn ' \
     | grep '^[-+]' \
     > "$changes_today" \
     || true
@@ -49,12 +67,22 @@ if test -s "$changes_today"; then
 fi
 cat "$changes_prev" >> "$changes_output"
 
-python3 -u awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
+python3 -u update-data/awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
 
-cp uglyshit.js output/
-cp fonts.css output/
-cp og-image.png output/
-cp robots.txt output/
-npx tailwindcss -i uglyshit.css -o output/uglyshit.css
+# Bundle a copy with the function. Find a better way for this.
+cp "$changes_output" web/src/.generated-endpoint-changes.text
+
+npx tailwindcss -i web/static/uglyshit.tailwind -o output/uglyshit.css
+cp node_modules/htmx.org/dist/htmx.min.js output/htmx.min.js
 
 aws s3 sync output/ "$S3BASE"/
+aws s3 sync web/static/ "$S3BASE"/
+
+pip install \
+    --platform manylinux2014_aarch64 \
+    --python-version 3.13 \
+    --target .pydep/python \
+    --only-binary=:all: \
+    psycopg-binary
+
+cdk deploy $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"

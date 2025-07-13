@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@source "./backend/*.py";
+
 @theme {
   --font-*: initial;
   --font-sans: Amazon Ember;
@@ -35,4 +37,9 @@ a {
 
 code {
   @apply pl-0.5 pr-0.5 bg-gray-100 rounded-sm;
+}
+
+.htmx-request {
+  opacity: .2;
+  transition: opacity 300ms linear 200ms;
 }
