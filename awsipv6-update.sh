@@ -26,19 +26,21 @@ if ! test -d output; then
     mkdir output
 fi
 
-if ! test -d "$BOTOCORE_REPO"; then
-    git clone -b master https://github.com/boto/botocore.git "$BOTOCORE_REPO"
-    sed -i.orig "s/^__version__ = '/__version__ = 'awsipv6-git-/" "$BOTOCORE_REPO/botocore/__init__.py"
-else
-    ( cd "$BOTOCORE_REPO" && git pull )
-fi
-
 if test "$SKIP_GET" -ne 1; then
     export DSQL_ENDPOINT=$(
         aws cloudformation describe-stacks --stack-name "$CDK_DSQL_STACK_NAME" \
         | jq -j '.Stacks[].Outputs[] | select(.OutputKey == "DsqlClusterEndpoint") | .OutputValue'
     )
     python3 -u update-data/awsipv6-get.py "$BOTOCORE_REPO" $LIVE_ARG
+fi
+
+exit 0
+
+if ! test -d "$BOTOCORE_REPO"; then
+    git clone -b master https://github.com/boto/botocore.git "$BOTOCORE_REPO"
+    sed -i.orig "s/^__version__ = '/__version__ = 'awsipv6-git-/" "$BOTOCORE_REPO/botocore/__init__.py"
+else
+    ( cd "$BOTOCORE_REPO" && git pull )
 fi
 
 changes_output="output/changes"

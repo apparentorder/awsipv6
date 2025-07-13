@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '42 3 * * 2-6'
-    
+
 permissions:
   id-token: write
   contents: read
-  
+
 jobs:
   deploy_source:
     name: deploy to awsipv6 s3
@@ -21,7 +21,7 @@ jobs:
           role-to-assume: arn:aws:iam::329261680777:role/awsipv6-github
           role-session-name: github-action-copy-s3
           role-duration-seconds: 14400
-          aws-region: eu-central-1
+          aws-region: eu-west-1
       - name: install stuff
         run: |
           npm install
