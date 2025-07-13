@@ -122,6 +122,10 @@ class Awsipv6Stack(cdk.Stack):
             primary key (region_name, partition_name)
         );
         grant select on endpoint, region to be_read;
+
+        The "update-data" scripts use a DSQL "admin" token, so do not need to be known
+        to the database via AWS IAM GRANT. The deployment role (awsipv6-github) does
+        need IAM permissions for DSQL accordingly.
         """
         dsql_cluster = dsql.CfnCluster(self, f"Awsipv6DsqlCluster",
             deletion_protection_enabled = False,
