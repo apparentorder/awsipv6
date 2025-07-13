@@ -25,9 +25,13 @@ jobs:
       - name: install stuff
         run: |
           npm install
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install psycopg-binary
       - name: build beta
         run: |
           bash awsipv6-update.sh
       - name: build live
         run: |
           bash awsipv6-update.sh --live
+
