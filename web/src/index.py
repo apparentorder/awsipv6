@@ -125,7 +125,7 @@ def get_table_data(event, region_list_from_user, html_only = False):
     if filter_class == "ipv6":
         query += " AND endpoint_default_has_ipv6"
     elif filter_class == "ipv6-dualstack":
-        query += " AND endpoint_dualstack_has_ipv6"
+        query += " AND (endpoint_dualstack_has_ipv6 OR endpoint_default_has_ipv6)"
 
     endpoint_rows = dsql_execute(query, query_parameters).fetchall()
 
