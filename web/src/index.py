@@ -439,7 +439,7 @@ def get_main(event, region_list_from_user):
                         <li>This page is a new dynamic interface introduced in 2025-07; the  <a href="endpoints.html">old page</a> (a massive blob of HTML) is still available and being updated for a while longer</li>
                         <li>Selected regions will be remembered when this page is opened the next time (using a cookie)</li>
                         <li>IPv4 and IPv6 support is determined by DNS only (i.e. if an endpoint returns any AAAA records, it is considered IPv6-enabled)</li>
-                        <li>AWS partitions that are marked as <code>_UNSUPPORTED_DUALSTACK_PARTITIONS</code> have been excluded.</li>
+                        <li>AWS partitions that are marked as <code>_UNSUPPORTED_DUALSTACK_PARTITIONS</code> have been excluded; same for partitions that seemingly should have been flagged non-dualstack but weren't (<code>aws-iso-e</code>, <code>aws-iso-f</code>)</li>
                         <li>Service APIs that require additional parameters have been excluded (currently only <code>cloudfront-keyvaluestore</code> and <code>s3control</code>)</li>
                         <li>Regions that are not available for a service are not checked, according to botocore's <code>get_available_services()</code> (which seems to be wrong sometimes)</li>
                         <li>Non-regionalized services (that have only one partition-wide endpoint, i.e. IAM or Route53) are not properly supported yet</li>
