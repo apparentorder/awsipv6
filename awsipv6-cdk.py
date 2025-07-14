@@ -54,7 +54,7 @@ class Awsipv6CdnStack(cdk.Stack):
             enable_ipv6 = True,
             # default_root_object = "awsipv6-main",
             http_version = cloudfront.HttpVersion.HTTP2_AND_3,
-            default_root_object = "endpoints.html",
+            default_root_object = "awsipv6-main",
             default_behavior = cloudfront.BehaviorOptions(
                 origin = s3_origin,
                 viewer_protocol_policy = cloudfront.ViewerProtocolPolicy.ALLOW_ALL,
