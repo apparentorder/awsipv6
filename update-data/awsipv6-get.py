@@ -29,6 +29,8 @@ assert("awsipv6-git" in botocore.__version__)
 # ----------------------------------------------------------------------
 # collect / generate data
 
+print(f"Gathering endpoint data ...")
+
 sec = ServiceEndpointsCollection(use_test_data = use_test_data)
 
 for service_name in sorted(sec.all_services):
@@ -41,6 +43,8 @@ for service_name in sorted(sec.all_services):
 
 # ----------------------------------------------------------------------
 # write database output
+
+print(f"Writing output to DSQL at {os.environ.get('DSQL_ENDPOINT')} ...")
 
 dsql_client = boto3.client('dsql')
 dsql_token = dsql_client.generate_db_connect_admin_auth_token(Hostname = os.environ.get('DSQL_ENDPOINT'))
@@ -92,6 +96,8 @@ with conn.cursor() as cur:
         # aligning nicely with DSQL's row limit.
         partition_name = region_data['partition']
 
+        print(f"* {region_name} ...")
+
         cur.execute(insert_region_sql, (
             region_name,
             partition_name,
@@ -116,11 +122,15 @@ with conn.cursor() as cur:
 # ----------------------------------------------------------------------
 # write json output
 
+print(f"Writing output to output/endpoints.json ...")
+
 with open(f"output/endpoints.json", "w") as json_file:
     json.dump(sec.data(), json_file, indent = 4)
 
 # ----------------------------------------------------------------------
 # write text output
+
+print(f"Writing output to output/endpoints.text ...")
 
 all_endpoints_text = []
 for sep in sec.endpoints:
@@ -130,3 +140,5 @@ for sep in sec.endpoints:
 with open(f"output/endpoints.text", "w") as text_file:
     for ep in sorted(all_endpoints_text):
         print(f"{ep}", file = text_file)
+
+print(f"Done.")
