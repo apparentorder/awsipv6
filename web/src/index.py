@@ -4,6 +4,7 @@ import os
 import re
 import html
 import boto3
+import time
 
 DEFAULT_REGION_SELECTION = sorted([
     # default region selection
@@ -29,7 +30,7 @@ def dsql_connect():
         dbname = 'postgres',
         user = 'be_read',
         password = dsql_token,
-        sslmode = 'require',
+        sslmode = 'require', # TODO: use verify-full
         sslnegotiation = "direct",
         row_factory = psycopg.rows.namedtuple_row,
         autocommit = True, # psycopg would leave idle transactions open even for read queries (and we don't write)
@@ -41,14 +42,12 @@ def dsql_execute(query, params = None):
         dsql_connection = dsql_connect()
 
     try:
-        #with dsql_connection.transaction():
         return dsql_connection.execute(query, params, prepare = True)
     except psycopg.OperationalError as e:
         print(f"Database connection error: {e}")
         print(f"Attempting reconnect")
         dsql_connection.close()
         dsql_connection = dsql_connect()
-        #with dsql_connection.transaction():
         return dsql_connection.execute(query, params, prepare = True)
 
 all_regions_query = """
@@ -127,7 +126,10 @@ def get_table_data(event, region_list_from_user, html_only = False):
     elif filter_class == "ipv6-dualstack":
         query += " AND (endpoint_dualstack_has_ipv6 OR endpoint_default_has_ipv6)"
 
+    t0 = time.perf_counter()
     endpoint_rows = dsql_execute(query, query_parameters).fetchall()
+    query_time = time.perf_counter() - t0
+    query_time_str = f'{query_time * 1000:.0f} ms'
 
     endpoints = {}
     for row in endpoint_rows:
@@ -143,7 +145,7 @@ def get_table_data(event, region_list_from_user, html_only = False):
     for service_name in sorted(endpoints.keys()):
         service_rows_html += f"""
             <tr class="service-row data-service-{service_name} border-b border-gray-500 border-dotted">
-                <th class="service-name pr-1">{service_name}</th>
+                <th class="service-name font-medium pr-1">{service_name}</th>
         """
 
         for region_name in region_list_from_user:
@@ -204,17 +206,20 @@ def get_table_data(event, region_list_from_user, html_only = False):
         service_rows_html += "</tr>\n"
 
     body = f"""
-        <table id="table-data" class="text-center text-sm font-light flex-col">
-            <thead class="border-b border-gray-500 border-dotted font-medium">
-                <tr>
-                    <th>Service</th>
-                    {region_headers_html}
-                </tr>
-            </thead>
-            <tbody class="flex-1">
-                {service_rows_html}
-            </tbody>
-        </table>
+        <div id="table-data" class="text-center text-sm flex-col font-light">
+            <table>
+                <thead class="border-b border-gray-500 border-dotted font-medium">
+                    <tr>
+                        <th>Service</th>
+                        {region_headers_html}
+                    </tr>
+                </thead>
+                <tbody class="flex-1">
+                    {service_rows_html}
+                </tbody>
+            </table>
+            <div class="text-left font-light text-xs text-gray-500 py-2">Endpoint data retrieved from Aurora DSQL in {query_time_str}.</div>
+        </div>
     """
 
     if html_only:
