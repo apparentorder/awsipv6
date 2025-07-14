@@ -300,7 +300,7 @@ def get_main(event, region_list_from_user):
                 <meta property="og:title" content="AWS service endpoints by region and IPv6 support">
                 <meta name="description" content="A map to quickly identify which AWS services in your region support IPv6 by default and which require using a special dualstack endpoint">
                 <meta property="og:description" content="A map to quickly identify which AWS services in your region support IPv6 by default and which require using a special dualstack endpoint">
-                <meta property="og:image" content="https://awsipv6.s3.eu-central-1.amazonaws.com/og-image.png">
+                <meta property="og:image" content="https://awsipv6.neveragain.de/og-image.png">
                 <meta property="og:type" content="website">
                 <link rel="stylesheet" href="uglyshit.css">
                 <link rel="stylesheet" href="fonts.css">
