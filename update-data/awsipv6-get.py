@@ -1,8 +1,8 @@
 import json
 import os
 import psycopg
-import subprocess
 import sys
+import time
 
 # ----------------------------------------------------------------------
 # take care of importing botocore from a git clone
@@ -40,6 +40,8 @@ for service_name in sorted(sec.all_services):
         partition_name = region_data['partition']
 
         sec.add(service_name, partition_name, region_name)
+
+print()
 
 # ----------------------------------------------------------------------
 # write database output
@@ -98,26 +100,38 @@ with conn.cursor() as cur:
 
         print(f"* {region_name} ...")
 
-        cur.execute(insert_region_sql, (
-            region_name,
-            partition_name,
-            region_data['description'],
-        ))
+        t0 = time.perf_counter()
 
+        cur.execute(insert_region_sql, (
+                region_name,
+                partition_name,
+                region_data['description'],
+            ),
+            prepare = True,
+        )
+
+        insert_count = 0
         for sep in filter(lambda ep: ep.region_name == region_name, sec.endpoints):
-                cur.execute(insert_sql, (
-                    sep.service_name,
-                    sep.partition_name,
-                    sep.region_name,
-                    sep.endpoint_default.hostname,
-                    sep.endpoint_default.has_ipv4,
-                    sep.endpoint_default.has_ipv6,
-                    sep.endpoint_dualstack.hostname,
-                    sep.endpoint_dualstack.has_ipv4,
-                    sep.endpoint_dualstack.has_ipv6,
-                ))
+            insert_count += 1
+            cur.execute(insert_sql, (
+                sep.service_name,
+                sep.partition_name,
+                sep.region_name,
+                sep.endpoint_default.hostname,
+                sep.endpoint_default.has_ipv4,
+                sep.endpoint_default.has_ipv6,
+                sep.endpoint_dualstack.hostname,
+                sep.endpoint_dualstack.has_ipv4,
+                sep.endpoint_dualstack.has_ipv6,
+            ))
 
         conn.commit()
+
+        t = time.perf_counter() - t0
+        print(f'  transaction duration {t:.3f} seconds; insert count: {insert_count}')
+        print()
+
+print()
 
 # ----------------------------------------------------------------------
 # write json output
@@ -126,6 +140,8 @@ print(f"Writing output to output/endpoints.json ...")
 
 with open(f"output/endpoints.json", "w") as json_file:
     json.dump(sec.data(), json_file, indent = 4)
+
+print()
 
 # ----------------------------------------------------------------------
 # write text output
