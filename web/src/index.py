@@ -5,6 +5,7 @@ import re
 import html
 import boto3
 import time
+import datetime
 
 DEFAULT_REGION_SELECTION = sorted([
     # default region selection
@@ -218,7 +219,12 @@ def get_table_data(event, region_list_from_user, html_only = False):
                     {service_rows_html}
                 </tbody>
             </table>
-            <div class="text-left font-light text-xs text-gray-500 py-2">Endpoint data retrieved from Aurora DSQL in {query_time_str}.</div>
+            <div class="has-tooltip">
+                <div class="text-left font-light text-xs text-gray-500 py-2">Endpoint data retrieved from Aurora DSQL in {query_time_str}.</div>
+                <span class="tooltip rounded shadow-lg p-1 bg-gray-100 -mt-8">
+                    {datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")}
+                </span>
+            </div>
         </div>
     """
 
