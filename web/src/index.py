@@ -367,8 +367,8 @@ def get_main(event, region_list_from_user):
                                 autofocus
                                 pattern="[a-z0-9]*"
                                 class="w-full px-1 border-1 bg-white rounded border-1"
-                                onkeydown="if (event.key === 'Escape') event.target.value = '';"
-                                onkeyup="removeEndpointClassFilter()"
+                                onkeydown="if (event.key === 'Escape') event.target.value = ''"
+                                onkeyup="if (event.key.length == 1) removeEndpointClassFilter()"
                             >
                         </div>
 
