@@ -20,6 +20,7 @@ sys.path.insert(0, f"{botocore_repo}")
 
 import botocore
 import boto3
+import sqlite3
 from Endpoints import ServiceEndpointsCollection
 
 # check for dummy tag to make sure we haven't accidentally imported the
@@ -156,5 +157,83 @@ for sep in sec.endpoints:
 with open(f"output/endpoints.text", "w") as text_file:
     for ep in sorted(all_endpoints_text):
         print(f"{ep}", file = text_file)
+
+# ----------------------------------------------------------------------
+# write sqlite output
+
+sqlite_path = "output/endpoints.sqlite"
+print(f"Writing output to {sqlite_path} ...")
+
+with sqlite3.connect(sqlite_path) as conn_sqlite:
+    cur_sqlite = conn_sqlite.cursor()
+    cur_sqlite.execute("""
+        CREATE TABLE IF NOT EXISTS region (
+            region_name TEXT,
+            partition_name TEXT,
+            description TEXT,
+            PRIMARY KEY (region_name, partition_name)
+        )
+    """)
+
+    cur_sqlite.execute("""
+        CREATE TABLE IF NOT EXISTS endpoint (
+            service_name TEXT,
+            region_name TEXT,
+            partition_name TEXT,
+            endpoint_default_hostname TEXT,
+            endpoint_default_has_ipv4 INTEGER,
+            endpoint_default_has_ipv6 INTEGER,
+            endpoint_dualstack_hostname TEXT,
+            endpoint_dualstack_has_ipv4 INTEGER,
+            endpoint_dualstack_has_ipv6 INTEGER,
+            PRIMARY KEY (service_name, region_name, partition_name)
+        )
+    """)
+
+    for region_name, region_data in sec.all_regions.items():
+        cur_sqlite.execute("""
+            INSERT INTO region (region_name, partition_name, description)
+            VALUES (?, ?, ?)
+            ON CONFLICT(region_name, partition_name) DO UPDATE SET description=excluded.description
+        """, (
+            region_name,
+            region_data['partition'],
+            region_data['description'],
+        ))
+
+    for sep in sec.endpoints:
+        cur_sqlite.execute("""
+            INSERT INTO endpoint (
+                service_name,
+                partition_name,
+                region_name,
+                endpoint_default_hostname,
+                endpoint_default_has_ipv4,
+                endpoint_default_has_ipv6,
+                endpoint_dualstack_hostname,
+                endpoint_dualstack_has_ipv4,
+                endpoint_dualstack_has_ipv6
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(service_name, partition_name, region_name) DO UPDATE SET
+                endpoint_default_hostname=excluded.endpoint_default_hostname,
+                endpoint_default_has_ipv4=excluded.endpoint_default_has_ipv4,
+                endpoint_default_has_ipv6=excluded.endpoint_default_has_ipv6,
+                endpoint_dualstack_hostname=excluded.endpoint_dualstack_hostname,
+                endpoint_dualstack_has_ipv4=excluded.endpoint_dualstack_has_ipv4,
+                endpoint_dualstack_has_ipv6=excluded.endpoint_dualstack_has_ipv6
+        """, (
+            sep.service_name,
+            sep.partition_name,
+            sep.region_name,
+            sep.endpoint_default.hostname,
+            int(sep.endpoint_default.has_ipv4),
+            int(sep.endpoint_default.has_ipv6),
+            sep.endpoint_dualstack.hostname,
+            int(sep.endpoint_dualstack.has_ipv4),
+            int(sep.endpoint_dualstack.has_ipv6),
+        ))
+
+print()
 
 print(f"Done.")

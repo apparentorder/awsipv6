@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SQLite Data Viewer</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background: #f0f0f0; }
+        input[type="text"] { width: 200px; padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>SQLite Data Viewer</h1>
+    <label for="filter">Filter:</label>
+    <input type="text" id="filter" placeholder="Type to filter table..." disabled>
+    <div id="tableContainer"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script>
+        let db, tableData = [], columns = [];
+
+        async function loadSqliteFile() {
+            // Assumes the SQLite file is named 'data.sqlite' and is in the same directory as the HTML file
+            const response = await fetch('endpoints.sqlite');
+            if (!response.ok) {
+                document.getElementById('tableContainer').innerHTML = 'Could not load SQLite file.';
+                return;
+            }
+            const arrayBuffer = await response.arrayBuffer();
+            const SQL = await initSqlJs({ locateFile: file => 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.wasm' });
+            db = new SQL.Database(new Uint8Array(arrayBuffer));
+            // Get first table name
+            const res = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' LIMIT 1;");
+            if (!res[0]) {
+                document.getElementById('tableContainer').innerHTML = 'No user tables found.';
+                return;
+            }
+            const tableName = res[0].values[0][0];
+            loadTable(tableName);
+            document.getElementById('filter').disabled = false;
+        }
+
+        function loadTable(tableName) {
+            const res = db.exec(`SELECT * FROM "${tableName}"`);
+            if (!res[0]) {
+                document.getElementById('tableContainer').innerHTML = 'Table is empty.';
+                return;
+            }
+            columns = res[0].columns;
+            tableData = res[0].values;
+            renderTable(tableData);
+        }
+
+        function renderTable(data) {
+            let html = '<table><thead><tr>';
+            columns.forEach(col => html += `<th>${col}</th>`);
+            html += '</tr></thead><tbody>';
+            data.forEach(row => {
+                html += '<tr>' + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('tableContainer').innerHTML = html;
+        }
+
+        document.getElementById('filter').addEventListener('input', function() {
+            const val = this.value.toLowerCase();
+            const filtered = tableData.filter(row =>
+                row.some(cell => String(cell).toLowerCase().includes(val))
+            );
+            renderTable(filtered);
+        });
+
+        // Load the SQLite file on page load
+        loadSqliteFile();
+    </script>
+</body>
+</html>
