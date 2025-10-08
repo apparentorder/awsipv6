@@ -37,7 +37,8 @@
                 document.getElementById('tableContainer').innerHTML = 'No user tables found.';
                 return;
             }
-            const tableName = res[0].values[0][0];
+            // const tableName = res[0].values[0][0];
+            const tableName = "endpoint";
             loadTable(tableName);
             document.getElementById('filter').disabled = false;
         }
