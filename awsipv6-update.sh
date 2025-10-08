@@ -23,8 +23,10 @@ if test "$1" = "--skip-get"; then
     shift
 fi
 
-rm -rf output
-mkdir output
+if test "$SKIP_GET" -ne 1; then
+    rm -rf output
+    mkdir output
+fi
 
 if test "$SKIP_GET" -ne 1; then
     if ! test -d "$BOTOCORE_REPO"; then
@@ -73,6 +75,8 @@ cat "$changes_prev" >> "$changes_output"
 if test "$SKIP_GET" -ne 1; then
     python3 -u update-data/awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
 fi
+
+python3 -u web/build/generate-html.py output/endpoints.json
 
 # Bundle a copy with the function. Find a better way for this.
 cp "$changes_output" web/src/.generated-endpoint-changes.text
