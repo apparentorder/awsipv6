@@ -1,26 +1,38 @@
 @import 'tailwindcss';
 
 @source "./backend/*.py";
+@source "./web/build/*.py";
 
 @theme {
   --font-*: initial;
   --font-sans: Amazon Ember;
 }
 
+:root {
+  --color-endpoint-ipv6: theme('colors.green.400');
+  --color-endpoint-ipv6-dualstack: theme('colors.sky.200');
+  --color-endpoint-ipv4: theme('colors.red.200');
+  --color-endpoint-mixed: theme('colors.orange.200');
+}
+
 .endpoint-nx {
-  @apply bg-slate-300;
+  @apply bg-slate-200;
 }
 
 .endpoint-ipv4 {
-  @apply bg-red-300;
+  @apply bg-red-200;
 }
 
 .endpoint-ipv6 {
-  @apply bg-green-300;
+  @apply bg-green-400;
+}
+
+.endpoint-mixed {
+  @apply bg-orange-200;
 }
 
 .endpoint-ipv6-dualstack {
-  @apply bg-sky-300;
+  @apply bg-sky-200;
 }
 
 .tooltip {
@@ -35,6 +47,10 @@ a {
   @apply underline decoration-dotted text-orange-600;
 }
 
+p {
+  @apply pb-2;
+}
+
 code {
   @apply pl-0.5 pr-0.5 bg-gray-100 rounded-sm;
 }
@@ -44,68 +60,34 @@ code {
   transition: opacity 300ms linear 200ms;
 }
 
-.bubble-list {
-    list-style: none;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    /* background: linear-gradient(135deg, #e0e7ff, #a7f3d0); * Subtle background for contrast */
+.pie-chart-container {
     padding: 20px;
+}
+
+.pie-chart {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+}
+
+.pie-legend {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px;
+    border-radius: 5px;
 }
 
-.bubble-item {
-    margin: 2px;
-}
-
-.bubble-container {
-    min-width: 60px;
-    height: 30px;
-    background: rgba(255, 255, 255, 0.1); /* Semi-transparent base for glass effect */
-    border-radius: 15px;
-    overflow: hidden;
+.pie-legend-item {
     display: flex;
-    position: relative;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.3); /* Shadow and highlight */
-    backdrop-filter: blur(4px); /* Frosted glass effect */
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
-}
-
-.bubble-segment {
-    height: 100%;
-    transition: width 0.3s ease;
-    opacity: 0.85; /* Slightly transparent for depth */
-}
-
-/* Colors for segments with slight gradient for gloss */
-.segment-1 { background: linear-gradient(90deg, #ff6b6b, #ff8c8c); }
-.segment-2 { background: linear-gradient(90deg, #4ecdc4, #6ef7e8); }
-.segment-3 { background: linear-gradient(90deg, #45b7d1, #6ad4f0); }
-
-/* Single label styling */
-.bubble-label {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #fafafaff;
-    font-size: 12px;
+    align-items: center;
+    font-size: 14px;
     font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Stronger shadow for contrast */
-    background: rgba(0, 0, 0, 0.1); /* Slightly darker semi-transparent background */
-    padding: 1px 4px;
-    border-radius: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 90%;
-    text-align: center;
-    z-index: 1; /* Ensure label is above segments */
 }
 
-/* Hover effect for interactivity */
-.bubble-container:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 1px 3px rgba(255, 255, 255, 0.4);
+.pie-legend-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    border-radius: 3px;
 }

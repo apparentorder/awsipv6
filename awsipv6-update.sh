@@ -76,7 +76,7 @@ if test "$SKIP_GET" -ne 1; then
     python3 -u update-data/awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
 fi
 
-python3 -u web/build/generate-html.py output/endpoints.json
+sh web/build/generate-html.sh
 
 # Bundle a copy with the function. Find a better way for this.
 cp "$changes_output" web/src/.generated-endpoint-changes.text
