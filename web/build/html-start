@@ -12,8 +12,8 @@
 	<meta property="og:type" content="website">
 	<link rel="stylesheet" href="uglyshit.css">
 	<link rel="stylesheet" href="fonts.css">
-	<script async src="htmx.min.js"></script>
-	<script async src="uglyshit.js"></script>
+	<script src="htmx.min.js"></script>
+	<script src="uglyshit.js"></script>
 </head>
 
 <body class="flex flex-col min-h-screen">
