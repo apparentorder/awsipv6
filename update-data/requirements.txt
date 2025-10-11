@@ -2,4 +2,3 @@ boto3
 psycopg
 aws-cdk-lib
 constructs
-sqlite3
