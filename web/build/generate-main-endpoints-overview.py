@@ -62,12 +62,12 @@ html = f'''
         <div class="max-w-prose">
             <p class="text-lg">
                 This summary chart shows how many AWS services support IPv6 client applications
-                on their public API endpoints, categorized by the mode of IPv6 support and by
-                consistency across AWS regions.
+                on their public API endpoints.
             </p>
 
             <p class="text-sm">
-                More detailed data on endpoints is available on the other pages.
+                Other pages of this site provide more detailed data on service endpoints, and some
+                documentation on why this matters for developing AWS applications with IPv6 support.
             </p>
 
             <p class="text-sm">

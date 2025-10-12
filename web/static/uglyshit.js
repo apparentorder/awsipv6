@@ -101,7 +101,7 @@ document.addEventListener('touchstart', function(e) {
         const serviceName = tr.querySelector('td').textContent.trim();
         showTooltip(tr, serviceName);
         // Hide after 6 seconds or on next touch
-        setTimeout(hideTooltip, 6000);
+        // setTimeout(hideTooltip, 6000);
     }
 }, true);
 

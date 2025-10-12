@@ -8,6 +8,6 @@
 		This site is a personal project. It is not affiliated with Amazon Web Services (AWS).
 	</div>
 </footer>
-<div id="tooltip" class="absolute hidden bg-amber-200 border border-gray-300 rounded shadow-lg p-2 z-50 size-content"></div>
+<div id="tooltip" class="absolute hidden bg-orange-100 border border-gray-300 rounded shadow-lg p-2 z-50 size-content"></div>
 </body>
 </html>

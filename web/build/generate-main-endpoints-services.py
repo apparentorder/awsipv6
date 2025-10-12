@@ -19,7 +19,7 @@ cur = epdb.execute("""
     GROUP BY service_name
     HAVING count_active
     ORDER BY
-        (ipv6_default_count*15 + ipv6_dualstack_count*3 - ipv4_count*7)*100/count_active DESC,
+        --(ipv6_default_count*15 + ipv6_dualstack_count*3 - ipv4_count*7)*100/count_active DESC,
         service_name
 """)
 
@@ -43,6 +43,8 @@ for row in cur.fetchall():
         </tr>
     '''
 
+    # ----- write tooltip -----
+
     service_regions = epdb.execute("""
         SELECT *
         FROM endpoint
@@ -62,51 +64,14 @@ for row in cur.fetchall():
             case _:
                 region_class[region['region_name']] = "endpoint-nx"
 
-    html_tooltip = f'''
-        <div class="font-semibold">{row['service_name']}</div>
-
-        <div class="flex visible lg:hidden text-xs"> <!-- compact region list for small screens -->
-    '''
+    html_tooltip = ''
+    html_tooltip += f'<div class="font-semibold">{row['service_name']}</div>'
+    html_tooltip += f'<div class="flex flex-wrap max-w-lg text-xs">'
 
     for region in service_regions:
-        html_tooltip += f'<span class="border p-1 text-nowrap border-gray-500 rounded-sm {region_class[region["region_name"]]}">{region["region_name"]}</span>\n'
+        html_tooltip += f'<span class="border px-1 text-nowrap border-gray-500 rounded-sm {region_class[region["region_name"]]}">{region["region_name"]}</span>\n'
 
-    html_tooltip += '''
-        </div>
-
-        <div class="hidden lg:block"> <!-- full detail region list for large screens -->
-            <table class="text-xs/3 whitespace-nowrap">
-                <tr>
-                    <th>Region</th>
-                    <th>Default endpoint</th>
-                    <th>Dual-stack endpoint</th>
-                </tr>
-    '''
-
-    for region in service_regions:
-        class_def = ""
-        match region:
-            case r if r['endpoint_default_has_ipv6']:
-                class_def = "endpoint-ipv6"
-            case r if r['endpoint_default_has_ipv4']:
-                class_def = "endpoint-ipv4"
-
-        class_ds = ""
-        match region:
-            case r if r['endpoint_dualstack_has_ipv6']:
-                class_ds = "endpoint-ipv6-dualstack"
-            case r if r['endpoint_dualstack_has_ipv4']:
-                class_ds = "endpoint-ipv4"
-
-        html_tooltip += f'''
-        <tr>
-            <th>{region['region_name']}</th>
-            <td class="endpoint-nx"><code class="{class_def}">{region['endpoint_default_hostname'] or ""}</code></td>
-            <td class="endpoint-nx"><code class="{class_ds}">{region['endpoint_dualstack_hostname'] or ""}</code></td>
-        </tr>
-        '''
-
-    html_tooltip += '</table></div>'
+    html_tooltip += f'</div>'
 
     open(f"output/endpoints-services-tooltip-{row['service_name']}.html", 'w').write(html_tooltip)
 
