@@ -8,14 +8,16 @@ epdb.row_factory = sqlite3.Row
 
 cur = epdb.execute("""
     SELECT
-        region_name,
-        (select description from region r where r.region_name = endpoint.region_name) as region_description,
+        r.partition_name,
+        r.region_name as region_name,
+        r.description as region_description,
         sum(endpoint_default_has_ipv6) as ipv6_default_count,
         sum(case when endpoint_dualstack_has_ipv6 and not endpoint_default_has_ipv6 then 1 else 0 end) as ipv6_dualstack_count,
         sum(case when endpoint_default_has_ipv4 and not endpoint_default_has_ipv6 and not endpoint_dualstack_has_ipv6 then 1 else 0 end) as ipv4_count,
         sum(case when endpoint_default_has_ipv4 or endpoint_dualstack_has_ipv4 then 1 else 0 end) as count_all
-    FROM endpoint
-    GROUP BY region_name
+    FROM endpoint e
+    LEFT JOIN region r ON e.region_name = r.region_name
+    GROUP BY r.partition_name, r.region_name, region_description
     HAVING count_all > 0
     ORDER BY
         --(ipv6_default_count*5 + ipv6_dualstack_count*3 - ipv4_count*10)*100/count_all DESC
@@ -26,7 +28,13 @@ cur = epdb.execute("""
 
     # ORDER BY (sum(endpoint_default_has_ipv6) * 100.0 / sum(case when endpoint_default_has_ipv4 then 1 else 0 end)) DESC,
     #          (sum(case when endpoint_dualstack_has_ipv6 and not endpoint_default_has_ipv6 then 1 else 0 end) * 100.0 / sum(case when endpoint_default_has_ipv4 then 1 else 0 end)) DESC
-html = f'<table class="progress-table">'
+html = f'''
+    <table class="progress-table">
+        <tr class="text-left">
+            <th>Region</th>
+            <th>IPv6 support &mdash; by default / opt-in / ipv4-only</th>
+        </tr>
+'''
 
 for row in cur.fetchall():
     region_description = row['region_description']

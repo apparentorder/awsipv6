@@ -23,7 +23,13 @@ cur = epdb.execute("""
         service_name
 """)
 
-html = f'<table class="progress-table">'
+html = f'''
+    <table class="progress-table">
+        <tr class="text-left">
+            <th>Service</th>
+            <th>IPv6 support &mdash; by default / opt-in / ipv4-only</th>
+        </tr>
+'''
 
 for row in cur.fetchall():
     percentages = {}

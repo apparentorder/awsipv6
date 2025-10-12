@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 python3 web/build/generate-main-endpoints-overview.py "$@"
 python3 web/build/generate-main-endpoints-services.py "$@"
 python3 web/build/generate-main-endpoints-regions.py "$@"
