@@ -66,15 +66,23 @@ function positionTooltip(target) {
     const rect = target.getBoundingClientRect();
     tooltipElement.style.left = `${rect.left + window.scrollX}px`;
     tooltipElement.style.top = `${rect.bottom + window.scrollY + 5}px`;
+
+    // Check if tooltip clips at bottom, if so position above
+    const tooltipRect = tooltipElement.getBoundingClientRect();
+    if (tooltipRect.bottom > window.innerHeight) {
+        tooltipElement.style.top = `${rect.top + window.scrollY - tooltipElement.offsetHeight - 5}px`;
+    }
 }
 
 // Event listeners for tooltips
 document.addEventListener('mouseenter', function(e) {
-    if (e.target.classList.contains('progress-table-row')) {
-        if (!window.location.pathname.includes('services')) return;
-        const tr = e.target.closest('tr');
+    const tr = e.target.closest('.progress-table-row');
+    if (!tr || !window.location.pathname.includes('services')) return;
+    const isFirstCell = e.target.tagName === 'TD' && e.target === tr.querySelector('td:first-child');
+    const isProgressBar = e.target.classList.contains('progress-bar') || e.target.closest('.progress-bar');
+    if (isFirstCell || isProgressBar) {
         const serviceName = tr.querySelector('td').textContent.trim();
-        showTooltip(e.target, serviceName);
+        showTooltip(tr, serviceName);
     }
 }, true);
 
@@ -85,13 +93,15 @@ document.addEventListener('mouseleave', function(e) {
 }, true);
 
 document.addEventListener('touchstart', function(e) {
-    if (e.target.classList.contains('progress-table-row')) {
-        if (!window.location.pathname.includes('services')) return;
-        const tr = e.target.closest('tr');
+    const tr = e.target.closest('.progress-table-row');
+    if (!tr || !window.location.pathname.includes('services')) return;
+    const isFirstCell = e.target.tagName === 'TD' && e.target === tr.querySelector('td:first-child');
+    const isProgressBar = e.target.classList.contains('progress-bar') || e.target.closest('.progress-bar');
+    if (isFirstCell || isProgressBar) {
         const serviceName = tr.querySelector('td').textContent.trim();
-        showTooltip(e.target, serviceName);
-        // Hide after 3 seconds or on next touch
-        setTimeout(hideTooltip, 3000);
+        showTooltip(tr, serviceName);
+        // Hide after 6 seconds or on next touch
+        setTimeout(hideTooltip, 6000);
     }
 }, true);
 
