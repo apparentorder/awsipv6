@@ -58,4 +58,3 @@ function setAllRegionsChecked(isChecked) {
         i.dispatchEvent(new Event('change'));
     }
 }
-

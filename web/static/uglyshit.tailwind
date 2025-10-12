@@ -93,17 +93,38 @@ code {
 }
 
 .progress-bar {
-    width: 200px;
-    height: 12px;
-    background: #e5e7eb;
     border-radius: 2px;
-    //overflow: hidden;
-    display: flex;
+    @apply border;
+    @apply border-gray-100;
+    @apply bg-gray-200;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
-    margin-left: 8px;
+    display: flex;
+    max-width: 500px;
+    height: 12px;
+    @apply w-full;
 }
 
 .progress-bar-segment {
-    height: 100%;
-    transition: width 0.3s ease;
+    //height: 100%;
+}
+
+.progress-table {
+    width: auto;
+    table-layout: auto;
+    @apply text-xs/3;
+}
+
+.progress-table tr:nth-child(odd) td:first-child {
+    @apply bg-gray-100;
+}
+
+.progress-table td:first-child {
+    white-space: nowrap;
+    //width: min-content;
+    @apply size-fit;
+    @apply pr-1;
+}
+
+.progress-table td:nth-child(2) {
+    @apply size-full;
 }
