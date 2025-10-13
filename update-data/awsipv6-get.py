@@ -173,6 +173,7 @@ with sqlite3.connect(sqlite_path) as conn_sqlite:
             description TEXT,
             PRIMARY KEY (region_name, partition_name)
         )
+        WITHOUT ROWID
     """)
 
     cur_sqlite.execute("""
@@ -188,6 +189,7 @@ with sqlite3.connect(sqlite_path) as conn_sqlite:
             endpoint_dualstack_has_ipv6 INTEGER,
             PRIMARY KEY (service_name, region_name, partition_name)
         )
+        WITHOUT ROWID
     """)
 
     for region_name, region_data in sec.all_regions.items():
