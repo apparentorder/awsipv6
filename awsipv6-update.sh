@@ -23,12 +23,13 @@ if test "$1" = "--skip-get"; then
     shift
 fi
 
-if test "$SKIP_GET" -ne 1; then
+if test "$SKIP_GET" = 1; then
+    # Keep previous change list if we do not collect new data.
+    aws s3 cp "$S3BASE"/endpoints.text output/endpoints.text
+else
     rm -rf output
     mkdir output
-fi
 
-if test "$SKIP_GET" -ne 1; then
     if ! test -d "$BOTOCORE_REPO"; then
         git clone -b master https://github.com/boto/botocore.git "$BOTOCORE_REPO"
         sed -i.orig "s/^__version__ = '/__version__ = 'awsipv6-git-/" "$BOTOCORE_REPO/botocore/__init__.py"
@@ -41,9 +42,6 @@ if test "$SKIP_GET" -ne 1; then
         | jq -j '.Stacks[].Outputs[] | select(.OutputKey == "DsqlClusterEndpoint") | .OutputValue'
     )
     python3 -u update-data/awsipv6-get.py "$BOTOCORE_REPO" $LIVE_ARG
-else
-    # Keep previous change list if we do not collect new data.
-    aws s3 cp "$S3BASE"/endpoints.text output/endpoints.text
 fi
 
 changes_output="output/changes"
@@ -78,11 +76,16 @@ fi
 
 sh web/build/generate-html.sh
 
-# Bundle a copy with the function. Find a better way for this.
-cp "$changes_output" web/src/.generated-endpoint-changes.text
-
 npx tailwindcss -i web/static/uglyshit.tailwind -o output/uglyshit.css
+
+# provide .gz versions for smaller downloads
+gzip --best --keep --force output/endpoints.sqlite
+gzip --best --keep --force output/endpoints.json
+
+cp output/endpoints.sqlite output/endpoints.sqlite--but.cloudfront.does.not.want.to.compress.binary.data.so.lets.just.call.it.xml
+
 cp node_modules/htmx.org/dist/htmx.min.js output/htmx.min.js
+rsync -a --delete node_modules/sql.js/dist/ output/sql.js/
 
 aws s3 sync output/ "$S3BASE"/
 aws s3 sync web/static/ "$S3BASE"/

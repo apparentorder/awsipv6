@@ -2,11 +2,9 @@
 
 set -e
 
-python3 web/build/generate-main-endpoints-overview.py "$@"
-python3 web/build/generate-main-endpoints-services.py "$@"
-python3 web/build/generate-main-endpoints-regions.py "$@"
+for page in overview regions services matrix; do
+    python3 "web/build/generate-main-endpoints-${page}.py" "$@"
 
-for page in overview regions services; do
     # This may be the first time in history that `cat` is used to CONCATENATE files.
     cat \
         web/build/html-start \

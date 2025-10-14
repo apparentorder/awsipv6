@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import re
+import os
 import sqlite3
 
 epdb = sqlite3.connect("output/endpoints.sqlite")
@@ -24,7 +24,8 @@ cur = epdb.execute("""
 """)
 
 html = f'''
-    <table class="progress-table">
+    <!-- file: {os.path.basename(__file__)} -->
+    <table class="progress-table font-light">
         <tr class="text-left">
             <th>Service</th>
             <th>IPv6 support &mdash; by default / opt-in / ipv4-only</th>
@@ -72,7 +73,7 @@ for row in cur.fetchall():
 
     html_tooltip = ''
     html_tooltip += f'<div class="font-semibold">{row['service_name']}</div>'
-    html_tooltip += f'<div class="flex flex-wrap max-w-lg text-xs">'
+    html_tooltip += f'<div class="flex flex-wrap max-w-lg text-xs font-light">'
 
     for region in service_regions:
         html_tooltip += f'<span class="border px-1 text-nowrap border-gray-500 rounded-sm {region_class[region["region_name"]]}">{region["region_name"]}</span>\n'

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>AWS Endpoints Matrix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="uglyshit.css">
+    <link rel="stylesheet" href="fonts.css">
+    <script src="htmx.min.js"></script>
+    <script src="uglyshit.js"></script>
+</head>
+<body class="flex flex-col min-h-screen">
+<div class="sticky top-0">
+    <header class="bg-orange-400 text-white text-center py-1 text-lg font-semibold">AWS Endpoints Matrix</header>
+    <nav class="bg-gray-100">
+        <div class="p-2">
+            <div class="mb-4">
+                <label for="region-search" class="block text-sm font-medium text-gray-700">Filter Regions:</label>
+                <input type="text" id="region-search" onkeyup="filterRegions()" placeholder="Search regions..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div id="region-checkboxes" class="max-h-64 overflow-y-auto">
+                <!-- Region checkboxes will be populated by JavaScript -->
+            </div>
+            <div class="mt-4">
+                <label for="service-filter" class="block text-sm font-medium text-gray-700">Filter Services:</label>
+                <input type="text" id="service-filter" onkeyup="filterServices()" placeholder="Search services..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+        </div>
+    </nav>
+</div>
+
+<main class="p-4">
+    <div id="endpoints-table">
+        <p class="text-center text-gray-500">Select regions above to load endpoint data.</p>
+    </div>
+</main>
+
+<footer class="mt-auto border-t border-gray-300 p-1 text-xs bg-gray-100">
+    <div>Contact: <a href="https://x.com/apparentorder">@apparentorder</a> (Twitter) or <a href="mailto:apparentorder@neveragain.de">e-mail</a>.</div>
+    <div>This site is a personal project. It is not affiliated with Amazon Web Services (AWS).</div>
+</footer>
+
+<script src="endpoints-matrix.js"></script>
+</body>
+</html>

@@ -1,3 +1,4 @@
+import os
 import sqlite3
 
 epdb = sqlite3.connect("output/endpoints.sqlite")
@@ -58,6 +59,7 @@ pie_conic_gradient_str = ", ".join(parts)
 # -----
 
 html = f'''
+    <!-- file: {os.path.basename(__file__)} -->
     <div class="flex flex-col md:flex-row gap-4">
         <div class="max-w-prose">
             <p class="text-lg">

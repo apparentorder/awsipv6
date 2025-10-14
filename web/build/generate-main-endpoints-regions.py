@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import re
 import sqlite3
 
@@ -29,7 +30,8 @@ cur = epdb.execute("""
     # ORDER BY (sum(endpoint_default_has_ipv6) * 100.0 / sum(case when endpoint_default_has_ipv4 then 1 else 0 end)) DESC,
     #          (sum(case when endpoint_dualstack_has_ipv6 and not endpoint_default_has_ipv6 then 1 else 0 end) * 100.0 / sum(case when endpoint_default_has_ipv4 then 1 else 0 end)) DESC
 html = f'''
-    <table class="progress-table">
+    <!-- file: {os.path.basename(__file__)} -->
+    <table class="progress-table font-light">
         <tr class="text-left">
             <th>Region</th>
             <th>IPv6 support &mdash; by default / opt-in / ipv4-only</th>
