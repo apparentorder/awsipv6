@@ -187,8 +187,11 @@ function populateRegionDropdown() {
     selectAllBtn.textContent = 'Select All';
     selectAllBtn.className = 'text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600';
     selectAllBtn.onclick = () => {
-        const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:not([style*="display: none"])');
-        checkboxes.forEach(cb => cb.checked = true);
+        const visibleLabels = dropdown.querySelectorAll('label:not([style*="display: none"])');
+        visibleLabels.forEach(label => {
+            const checkbox = label.querySelector('input[type="checkbox"]');
+            if (checkbox) checkbox.checked = true;
+        });
         handleRegionChange();
     };
 
