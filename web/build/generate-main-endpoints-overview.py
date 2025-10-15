@@ -101,7 +101,7 @@ html = f'''
             </div>
             <div class="text-xs text-gray-400 max-w-prose">
                 Services total: {total_services}. Data for AWS commercial regions only, as
-                the China / GovCloud / EU Sovereign Cloud partitions have severe differences.
+                the China / GovCloud / EU Sovereign Cloud partitions have significant differences.
             </div>
         </div>
     </div>

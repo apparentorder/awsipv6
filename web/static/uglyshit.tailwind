@@ -115,7 +115,7 @@ code {
 }
 
 .progress-table tr:nth-child(odd) td:first-child {
-    @apply bg-gray-100;
+    @apply bg-gray-50;
 }
 
 .progress-table td:first-child {
@@ -127,4 +127,16 @@ code {
 
 .progress-table td:nth-child(2) {
     @apply size-full;
+}
+
+#matrix-table-body tr:nth-child(odd) {
+    @apply bg-gray-50;
+}
+
+#matrix-table-body th {
+  @apply text-left;
+}
+
+#matrix-table-body td {
+  @apply border border-1 border-dotted border-gray-300;
 }

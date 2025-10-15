@@ -1,5 +1,6 @@
 async function initSqliteFile() {
-    console.log('Loading EPDB...');
+    if (this.endpointsSqliteDatabase) return; // already loaded
+
     document.getElementById('matrix-table-caption').innerHTML = 'Loading EPDB ...';
 
     const [fetchResponse, SQL] = await Promise.all([
@@ -19,6 +20,8 @@ async function initSqliteFile() {
         ALTER TABLE region
         ADD COLUMN selected INTEGER DEFAULT 0
     `);
+
+    initRegions();
 }
 
 function setSelectedRegions(regionList) {
@@ -72,61 +75,90 @@ function loadEndpointsTable() {
         ORDER BY region_name
     `)[0].values.map(r => r[0]);
 
-    let headHtml = `
-        <tr>
-            <th>Service</th>
-    `;
-    regionNamesOrdered.forEach(regionName => headHtml += `<th>${regionName}</th>`);
-    headHtml += `
-        </tr>
-    `;
-    document.getElementById('matrix-table-head').innerHTML = headHtml;
+    const serviceNamesOrdered = this.endpointsSqliteDatabase.exec(`
+        SELECT DISTINCT service_name
+        FROM endpoint
+        ORDER BY service_name
+    `)[0].values.map(r => r[0]);
+
+    const headTr = document.getElementById('matrix-table-head-row');
+    for (const regionName of regionNamesOrdered) {
+        const th = headTr.appendChild(document.createElement('th'));
+        th.innerHTML = regionName;
+        th.classList.add('px-1');
+    }
 
     // -----
 
     const stmt = this.endpointsSqliteDatabase.prepare(`
         SELECT
-            e.service_name,
-            r.region_name,
-            e.endpoint_default_hostname,
-            e.endpoint_default_has_ipv4,
-            e.endpoint_default_has_ipv4,
-            e.endpoint_dualstack_hostname,
-            e.endpoint_dualstack_has_ipv4,
-            e.endpoint_dualstack_has_ipv4
-        FROM region r
-        LEFT JOIN endpoint e ON e.region_name = r.region_name
-        WHERE r.selected = 1
-        ORDER BY e.service_name, r.region_name
+            service_name,
+            region_name,
+            endpoint_default_hostname,
+            endpoint_default_has_ipv6,
+            endpoint_default_has_ipv4,
+            endpoint_dualstack_hostname,
+            endpoint_dualstack_has_ipv6,
+            endpoint_dualstack_has_ipv4
+        FROM endpoint e
+        WHERE e.service_name = ?
+        AND e.region_name = ?
     `);
 
-    let stepIsTrue = stmt.step();
-    while (stepIsTrue) {
-        const tr = document.getElementById('matrix-table-body').insertRow(-1);
-        const row = stmt.getAsObject();
-        tr.insertCell(-1).innerHTML = row.service_name;
-        console.log(row.service_name);
+    const fragment = document.createDocumentFragment();
+    for (const serviceName of serviceNamesOrdered) {
+        const tr = fragment.appendChild(document.createElement('tr'));
+        const th = tr.appendChild(document.createElement('th'));
+        th.innerHTML = serviceName;
 
-        for (let i = 0; i < regionNamesOrdered.length; i++) {
-            const row = stmt.getAsObject();
-            stepIsTrue = stmt.step();
+        for (const regionName of regionNamesOrdered) {
+            const row = stmt.getAsObject([serviceName, regionName]);
+            const td = tr.insertCell(-1);
 
-            tr.insertCell(-1).innerHTML = row.endpoint_default_hostname;
+            if (row.endpoint_default_has_ipv6) {
+                td.classList.add('endpoint-ipv6');
+                td.innerHTML = 'IPv6';
+            } else if (row.endpoint_dualstack_has_ipv6) {
+                td.classList.add('endpoint-ipv6-dualstack');
+                td.innerHTML = 'opt-in';
+            } else if (row.endpoint_default_has_ipv4 || row.endpoint_dualstack_has_ipv4) {
+                td.classList.add('endpoint-ipv4');
+                td.innerHTML = 'IPv4';
+            } else {
+                td.classList.add('endpoint-nx');
+                td.innerHTML = '-';
+            }
         }
+    }
+
+    stmt.free();
+
+    document.getElementById('matrix-table-body').appendChild(fragment);
+    document.getElementById('matrix-table-caption').innerHTML = 'AWS Service APIs Public Endpoints';
+
+    return;
+}
+
+function filterServices(input) {
+    const val = input.value.toLowerCase();
+    const tbody = document.getElementById('matrix-table-body');
+
+    for (const row of tbody.rows) {
+        const matches = row.cells[0].textContent.toLowerCase().includes(val);
+        row.style.display = matches ? '' : 'none';
     }
 }
 
-document.getElementById('filter').addEventListener('input', function() {
-    const val = this.value.toLowerCase();
-    const filtered = tableData.filter(row =>
-        row.some(cell => String(cell).toLowerCase().includes(val))
-    );
-    renderTable(filtered);
-});
+// document.getElementById('filter').addEventListener('input', function() {
+//     const val = this.value.toLowerCase();
+//     const tbody = document.getElementById('matrix-table-body');
 
-if (!this.endpointsSqliteDatabase) {
-    initSqliteFile().then(() => {
-        initRegions();
-        loadEndpointsTable();
-    });
-}
+//     for (const row of tbody.rows) {
+//         const matches = row.cells[0].textContent.toLowerCase().includes(val);
+//         row.style.display = matches ? '' : 'none';
+//     }
+// });
+
+initSqliteFile().then(() => {
+    loadEndpointsTable();
+});
