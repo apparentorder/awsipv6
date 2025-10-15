@@ -212,7 +212,7 @@ function populateRegionDropdown() {
 
 function toggleDropdown() {
     const dropdown = document.getElementById('region-dropdown');
-    dropdown.classList.toggle('hidden');
+    dropdown.classList.remove('hidden');
 }
 
 function filterRegions() {
@@ -234,6 +234,9 @@ function handleRegionChange() {
     const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
     setSelectedRegions(selected);
     loadEndpointsTable(); // Reload the table with new selection
+    const input = document.getElementById('region-search');
+    input.focus();
+    input.select();
 }
 
 function filterServices(input) {
@@ -253,7 +256,9 @@ document.addEventListener('click', function(event) {
     if (!input.contains(event.target) && !dropdown.contains(event.target)) {
         dropdown.classList.add('hidden');
         input.value = '';
-        filterRegions(); // Reset filter to show all regions
+        document.querySelectorAll('#region-dropdown label').forEach(label => {
+            label.style.display = '';
+        });
     }
 });
 
@@ -266,7 +271,6 @@ document.addEventListener('keydown', function(event) {
         if (activeElement === regionSearch) {
             document.getElementById('region-dropdown').classList.add('hidden');
             regionSearch.value = '';
-            filterRegions(); // Reset filter to show all regions
         }
     }
 });

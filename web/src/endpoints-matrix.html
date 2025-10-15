@@ -16,9 +16,9 @@
         <div class="p-2">
             <div class="mb-4">
                 <label for="region-search" class="block text-sm font-medium text-gray-700">Filter Regions:</label>
-                <input type="text" id="region-search" onkeyup="filterRegions()" placeholder="Search regions..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="text" id="region-search" onkeyup="filterRegions()" onclick="toggleDropdown()" placeholder="Search regions..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
             </div>
-            <div id="region-checkboxes" class="max-h-64 overflow-y-auto">
+            <div id="region-dropdown" class="max-h-64 overflow-y-auto hidden">
                 <!-- Region checkboxes will be populated by JavaScript -->
             </div>
             <div class="mt-4">
