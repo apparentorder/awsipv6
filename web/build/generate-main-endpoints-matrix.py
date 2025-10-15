@@ -15,6 +15,7 @@ html = f'''
                         id="filter"
                         type="search"
                         autofocus
+                        placeholder="Filter services..."
                         pattern="[a-z0-9]*"
                         oninput="filterServices(this)"
                         class="px-1 w-full box-border border-2 rounded"
@@ -24,6 +25,12 @@ html = f'''
 
             <div id="region-selection-items">
                 <strong>Select regions:</strong>
+                <div class="relative mt-2">
+                    <input type="text" id="region-search" placeholder="Select regions..." class="w-full px-2 py-1 border rounded" onclick="toggleDropdown()" oninput="filterRegions()">
+                    <div id="region-dropdown" class="absolute top-full left-0 w-full bg-white border rounded shadow-md max-h-96 overflow-y-auto hidden z-10">
+                        <!-- Region checkboxes will be populated by JavaScript -->
+                    </div>
+                </div>
             </div>
         </div>
 

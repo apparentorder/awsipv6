@@ -25,8 +25,23 @@ async function initSqliteFile() {
 }
 
 function setSelectedRegions(regionList) {
-    if (!regionList) {
-        throw new Error('regionList is null or undefined');
+    try {
+        if (!Array.isArray(regionList)) {
+            regionList = JSON.parse(regionList);
+        }
+    } catch(_) {
+        regionList = undefined
+    }
+
+    if (!regionList || !Array.isArray(regionList) || regionList.length === 0) {
+        regionList = [
+            'us-east-1', 'us-west-1',
+            'ca-central-1',
+            'eu-central-1',
+            'cn-north-1',
+            'us-gov-west-1',
+            'eusc-de-east-1',
+        ];
     }
 
     this.selectedRegions = [... new Set(regionList)];
@@ -39,14 +54,6 @@ function setSelectedRegions(regionList) {
 }
 
 function initRegions() {
-    const defaultRegionSelection = [
-        'us-east-1', 'us-west-1',
-        'ca-central-1',
-        'eu-central-1',
-        'cn-north-1',
-        'us-gov-west-1',
-        'eusc-de-east-1',
-    ];
 
     try {
         setSelectedRegions(JSON.parse(window.localStorage.getItem('regionSelection')));
@@ -65,9 +72,18 @@ function initRegions() {
         const [regionName, partitionName, description] = row;
         this.allRegions[regionName] = { regionName, partitionName, description };
     }
+
+    populateRegionDropdown();
 }
 
 function loadEndpointsTable() {
+    // Clear existing table content
+    const headTr = document.getElementById('matrix-table-head-row');
+    while (headTr.children.length > 1) { // Keep the first 'Service' th
+        headTr.removeChild(headTr.lastChild);
+    }
+    document.getElementById('matrix-table-body').innerHTML = '';
+
     const regionNamesOrdered = this.endpointsSqliteDatabase.exec(`
         SELECT region_name
         FROM region
@@ -81,7 +97,6 @@ function loadEndpointsTable() {
         ORDER BY service_name
     `)[0].values.map(r => r[0]);
 
-    const headTr = document.getElementById('matrix-table-head-row');
     for (const regionName of regionNamesOrdered) {
         const th = headTr.appendChild(document.createElement('th'));
         th.innerHTML = regionName;
@@ -139,6 +154,85 @@ function loadEndpointsTable() {
     return;
 }
 
+function populateRegionDropdown() {
+    const dropdown = document.getElementById('region-dropdown');
+    dropdown.innerHTML = '';
+
+    for (const regionName in this.allRegions) {
+        const region = this.allRegions[regionName];
+        const label = document.createElement('label');
+        label.className = 'block px-2 py-1 hover:bg-gray-100 cursor-pointer flex items-center text-sm';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = regionName;
+        checkbox.checked = this.selectedRegions.includes(regionName);
+        checkbox.onchange = () => handleRegionChange();
+
+        const geoMatch = region.description.match(/\(([^)]+)\)/);
+        const geo = geoMatch ? geoMatch[1] : region.partitionName; // fallback to partition if no parens
+        const span = document.createElement('span');
+        span.textContent = `${regionName} (${geo})`;
+        span.className = 'px-1';
+
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        dropdown.appendChild(label);
+    }
+
+    // Add Select All / Clear All buttons
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'flex justify-between px-2 py-2 border-t';
+
+    const selectAllBtn = document.createElement('button');
+    selectAllBtn.textContent = 'Select All';
+    selectAllBtn.className = 'text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600';
+    selectAllBtn.onclick = () => {
+        const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = true);
+        handleRegionChange();
+    };
+
+    const clearAllBtn = document.createElement('button');
+    clearAllBtn.textContent = 'Clear / reset';
+    clearAllBtn.className = 'text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600';
+    clearAllBtn.onclick = () => {
+        const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = false);
+        handleRegionChange();
+    };
+
+    buttonContainer.appendChild(selectAllBtn);
+    buttonContainer.appendChild(clearAllBtn);
+    dropdown.appendChild(buttonContainer);
+}
+
+function toggleDropdown() {
+    const dropdown = document.getElementById('region-dropdown');
+    dropdown.classList.toggle('hidden');
+}
+
+function filterRegions() {
+    const input = document.getElementById('region-search');
+    const filter = input.value.toLowerCase();
+    const labels = document.querySelectorAll('#region-dropdown label');
+
+    // Show dropdown when typing
+    document.getElementById('region-dropdown').classList.remove('hidden');
+
+    labels.forEach(label => {
+        const text = label.textContent.toLowerCase();
+        label.style.display = text.includes(filter) ? '' : 'none';
+    });
+}
+
+function handleRegionChange() {
+    const checkboxes = document.querySelectorAll('#region-dropdown input[type="checkbox"]');
+    const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+    setSelectedRegions(selected);
+    loadEndpointsTable(); // Reload the table with new selection
+}
+
 function filterServices(input) {
     const val = input.value.toLowerCase();
     const tbody = document.getElementById('matrix-table-body');
@@ -149,15 +243,22 @@ function filterServices(input) {
     }
 }
 
-// document.getElementById('filter').addEventListener('input', function() {
-//     const val = this.value.toLowerCase();
-//     const tbody = document.getElementById('matrix-table-body');
+// Close dropdown when clicking outside or pressing Escape
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('region-dropdown');
+    const input = document.getElementById('region-search');
+    if (!input.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
 
-//     for (const row of tbody.rows) {
-//         const matches = row.cells[0].textContent.toLowerCase().includes(val);
-//         row.style.display = matches ? '' : 'none';
-//     }
-// });
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        document.getElementById('region-dropdown').classList.add('hidden');
+        document.getElementById('region-search').value = '';
+        filterRegions(); // Reset filter to show all regions
+    }
+});
 
 initSqliteFile().then(() => {
     loadEndpointsTable();
