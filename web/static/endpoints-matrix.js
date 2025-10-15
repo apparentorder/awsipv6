@@ -169,10 +169,9 @@ function populateRegionDropdown() {
         checkbox.checked = this.selectedRegions.includes(regionName);
         checkbox.onchange = () => handleRegionChange();
 
-        const geoMatch = region.description.match(/\(([^)]+)\)/);
-        const geo = geoMatch ? geoMatch[1] : region.partitionName; // fallback to partition if no parens
         const span = document.createElement('span');
-        span.textContent = `${regionName} (${geo})`;
+        const geoMatch = region.description.match(/\(.*\)\s*$/);
+        span.textContent = geoMatch ? `${regionName} (${geoMatch[1]})` : regionName;
         span.className = 'px-1';
 
         label.appendChild(checkbox);
