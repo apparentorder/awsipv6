@@ -161,7 +161,7 @@ function populateRegionDropdown() {
     for (const regionName in this.allRegions) {
         const region = this.allRegions[regionName];
         const label = document.createElement('label');
-        label.className = 'block px-2 py-1 hover:bg-gray-100 cursor-pointer flex items-center text-sm';
+        label.className = 'block px-2 py-0 hover:bg-gray-100 cursor-pointer flex items-center text-sm';
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
@@ -181,7 +181,7 @@ function populateRegionDropdown() {
 
     // Add Select All / Clear All buttons
     const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'flex justify-between px-2 py-2 border-t';
+    buttonContainer.className = 'flex justify-between px-2 py-2 border-t sticky bottom-0 bg-white';
 
     const selectAllBtn = document.createElement('button');
     selectAllBtn.textContent = 'Select All';

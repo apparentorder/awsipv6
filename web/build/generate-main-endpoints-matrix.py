@@ -5,36 +5,38 @@ import os
 html = f'''
     <!-- file: {os.path.basename(__file__)} -->
 
-    <div id="everything" class="border-t flex">
+    <div id="everything" class="border-t">
 
-        <div id="settings" class="text-sm p-2 w-64 flex-initial space-y-4 bg-gray-100 border-r-2">
-            <div id="filter-services">
-                <label>
-                    <strong>Filter services:</strong>
-                    <input
-                        id="filter"
-                        type="search"
-                        autofocus
-                        placeholder="Filter services..."
-                        pattern="[a-z0-9]*"
-                        oninput="filterServices(this)"
-                        class="px-1 w-full box-border border-2 rounded"
-                    >
-                </label>
-            </div>
+        <div id="filters" class="p-4 bg-gray-100 border-b-2">
+            <div class="flex space-x-4">
+                <div id="filter-services">
+                    <label class="block text-sm font-medium text-gray-700">
+                        <input
+                            id="filter"
+                            type="search"
+                            autofocus
+                            pattern="[a-z0-9]*"
+                            placeholder="Filter services..."
+                            oninput="filterServices(this)"
+                            class="mt-1 px-2 py-1 w-64 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                    </label>
+                </div>
 
-            <div id="region-selection-items">
-                <strong>Select regions:</strong>
-                <div class="relative mt-2">
-                    <input type="text" id="region-search" placeholder="Select regions..." class="w-full px-2 py-1 border rounded" onclick="toggleDropdown()" oninput="filterRegions()">
-                    <div id="region-dropdown" class="absolute top-full left-0 w-full bg-white border rounded shadow-md max-h-96 overflow-y-auto hidden z-10">
-                        <!-- Region checkboxes will be populated by JavaScript -->
-                    </div>
+                <div id="region-selection-items">
+                    <label class="block text-sm font-medium text-gray-700">
+                        <div class="relative mt-1">
+                            <input type="text" id="region-search" placeholder="Select regions..." class="w-64 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" onclick="toggleDropdown()" oninput="filterRegions()">
+                            <div id="region-dropdown" class="absolute top-full left-0 w-full bg-white border rounded shadow-md max-h-[70vh] overflow-y-auto hidden z-10">
+                                <!-- Region checkboxes will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </label>
                 </div>
             </div>
         </div>
 
-        <div id="main-content" class="p-2 flex-auto">
+        <div id="main-content" class="p-4">
             <noscript>This requires JavaScript. Sorry, pal.</noscript>
 
             <div id="matrix-table-container"></div>
