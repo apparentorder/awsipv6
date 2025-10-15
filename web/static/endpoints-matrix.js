@@ -161,7 +161,7 @@ function populateRegionDropdown() {
     for (const regionName in this.allRegions) {
         const region = this.allRegions[regionName];
         const label = document.createElement('label');
-        label.className = 'block px-2 py-0 hover:bg-gray-100 cursor-pointer flex items-center text-sm';
+        label.className = 'block px-2 py-0 hover:bg-gray-100 cursor-pointer flex items-center text-sm whitespace-nowrap';
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
@@ -170,7 +170,7 @@ function populateRegionDropdown() {
         checkbox.onchange = () => handleRegionChange();
 
         const span = document.createElement('span');
-        const geoMatch = region.description.match(/\(.*\)\s*$/);
+        const geoMatch = region.description.match(/\((.*)\)\s*$/);
         span.textContent = geoMatch ? `${regionName} (${geoMatch[1]})` : regionName;
         span.className = 'px-1';
 
@@ -187,22 +187,23 @@ function populateRegionDropdown() {
     selectAllBtn.textContent = 'Select All';
     selectAllBtn.className = 'text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600';
     selectAllBtn.onclick = () => {
-        const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+        const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:not([style*="display: none"])');
         checkboxes.forEach(cb => cb.checked = true);
         handleRegionChange();
     };
 
-    const clearAllBtn = document.createElement('button');
-    clearAllBtn.textContent = 'Clear / reset';
-    clearAllBtn.className = 'text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600';
-    clearAllBtn.onclick = () => {
-        const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(cb => cb.checked = false);
-        handleRegionChange();
+    const resetBtn = document.createElement('button');
+    resetBtn.textContent = 'Reset';
+    resetBtn.className = 'text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600';
+    resetBtn.onclick = () => {
+        // Reset to default region selection
+        setSelectedRegions(null);
+        loadEndpointsTable();
+        populateRegionDropdown(); // Refresh checkboxes to show correct state
     };
 
     buttonContainer.appendChild(selectAllBtn);
-    buttonContainer.appendChild(clearAllBtn);
+    buttonContainer.appendChild(resetBtn);
     dropdown.appendChild(buttonContainer);
 }
 
@@ -248,14 +249,22 @@ document.addEventListener('click', function(event) {
     const input = document.getElementById('region-search');
     if (!input.contains(event.target) && !dropdown.contains(event.target)) {
         dropdown.classList.add('hidden');
+        input.value = '';
+        filterRegions(); // Reset filter to show all regions
     }
 });
 
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
-        document.getElementById('region-dropdown').classList.add('hidden');
-        document.getElementById('region-search').value = '';
-        filterRegions(); // Reset filter to show all regions
+        const activeElement = document.activeElement;
+        const regionSearch = document.getElementById('region-search');
+
+        // Only handle escape for the region search input
+        if (activeElement === regionSearch) {
+            document.getElementById('region-dropdown').classList.add('hidden');
+            regionSearch.value = '';
+            filterRegions(); // Reset filter to show all regions
+        }
     }
 });
 
