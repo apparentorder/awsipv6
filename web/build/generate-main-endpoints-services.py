@@ -38,7 +38,12 @@ for row in cur.fetchall():
         percentages[cat] = row[f'{cat}_count'] * 100 / region_count
 
     html += f'''
-        <tr class="progress-table-row">
+        <tr class="progress-table-row"
+            hx-get="endpoints-services-tooltip-{row['service_name']}.html"
+            hx-target="#tooltip"
+            hx-trigger="mouseenter"
+            hx-swap="innerHTML"
+            onmouseenter="document.getElementById('tooltip').classList.remove('hidden'); positionTooltip(this);">
             <td>{row['service_name']}</td>
             <td>
                 <div class="progress-bar">

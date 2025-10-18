@@ -210,10 +210,7 @@ function populateRegionDropdown() {
     dropdown.appendChild(buttonContainer);
 }
 
-function toggleDropdown() {
-    const dropdown = document.getElementById('region-dropdown');
-    dropdown.classList.remove('hidden');
-}
+// Dropdown toggle now handled by HTMX inline event
 
 function filterRegions() {
     const input = document.getElementById('region-search');
