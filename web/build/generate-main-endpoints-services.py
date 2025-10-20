@@ -25,11 +25,18 @@ cur = epdb.execute("""
 
 html = f'''
     <!-- file: {os.path.basename(__file__)} -->
+
+    <script defer src="tooltip.js"></script>
+
     <table class="progress-table font-light">
-        <tr class="text-left">
-            <th>Service</th>
-            <th>IPv6 support &mdash; by default / opt-in / ipv4-only</th>
-        </tr>
+        <thead>
+            <tr class="text-left">
+                <th>Service</th>
+                <th>IPv6 support &mdash; by default / opt-in / ipv4-only</th>
+            </tr>
+        </thead>
+
+        <tbody>
 '''
 
 for row in cur.fetchall():
@@ -38,12 +45,13 @@ for row in cur.fetchall():
         percentages[cat] = row[f'{cat}_count'] * 100 / region_count
 
     html += f'''
-        <tr class="progress-table-row"
-            hx-get="endpoints-services-tooltip-{row['service_name']}.html"
-            hx-target="#tooltip"
-            hx-trigger="mouseenter"
-            hx-swap="innerHTML"
-            onmouseenter="document.getElementById('tooltip').classList.remove('hidden'); positionTooltip(this);">
+        <tr
+            class="progress-table-row"
+            xhx-get="endpoints-services-tooltip-{row['service_name']}.html"
+            xhx-target="#tooltip"
+            xhx-trigger="mouseenter"
+            xhx-swap="innerHTML"
+        >
             <td>{row['service_name']}</td>
             <td>
                 <div class="progress-bar">
@@ -78,15 +86,16 @@ for row in cur.fetchall():
 
     html_tooltip = ''
     html_tooltip += f'<div class="font-semibold">{row['service_name']}</div>'
-    html_tooltip += f'<div class="flex flex-wrap max-w-lg text-xs font-light">'
+    html_tooltip += f'<div class="flex flex-wrap text-xs font-light">'
 
     for region in service_regions:
-        html_tooltip += f'<span class="border px-1 text-nowrap border-gray-500 rounded-sm {region_class[region["region_name"]]}">{region["region_name"]}</span>\n'
+        html_tooltip += f'<span class="border px-3 text-nowrap border-gray-500 rounded-sm {region_class[region["region_name"]]}">{region["region_name"]}</span>\n'
 
     html_tooltip += f'</div>'
 
     open(f"output/endpoints-services-tooltip-{row['service_name']}.html", 'w').write(html_tooltip)
 
+html += '</tbody>\n'
 html += '</table>\n'
 
 open("output/endpoints-services-main.html", 'w').write(html)

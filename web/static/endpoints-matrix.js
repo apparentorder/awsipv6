@@ -123,6 +123,8 @@ function loadEndpointsTable() {
     const fragment = document.createDocumentFragment();
     for (const serviceName of serviceNamesOrdered) {
         const tr = fragment.appendChild(document.createElement('tr'));
+        tr.classList.add("matrix-table-row");
+
         const th = tr.appendChild(document.createElement('th'));
         th.innerHTML = serviceName;
 

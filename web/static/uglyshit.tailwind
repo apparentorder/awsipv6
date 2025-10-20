@@ -35,14 +35,6 @@
   @apply bg-sky-200;
 }
 
-.tooltip {
-  @apply invisible absolute;
-}
-
-.has-tooltip:hover .tooltip {
-  @apply visible z-50;
-}
-
 a {
   @apply underline decoration-dotted text-orange-600;
 }
@@ -129,6 +121,10 @@ code {
     @apply size-full;
 }
 
+.progress-table-row {
+    content-visibility: auto;
+}
+
 #matrix-table-body tr:nth-child(odd) {
     @apply bg-gray-50;
 }
@@ -139,4 +135,8 @@ code {
 
 #matrix-table-body td {
   @apply border border-1 border-dotted border-gray-300;
+}
+
+.matrix-table-row {
+    content-visibility: auto;
 }
