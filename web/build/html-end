@@ -1,6 +1,6 @@
 </main>
 
-<div id="tooltip" class="border-t flex flex-row border-gray-300 sticky fixed z-50">Loading ...</div>
+<div id="tooltip" class="border-t border-gray-300 sticky bottom-0 w-full z-50 bg-gray-200">Loading ...</div>
 
 <footer class="mt-auto border-t border-gray-300 p-1 text-xs bg-gray-100">
 	<div>

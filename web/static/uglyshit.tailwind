@@ -123,6 +123,7 @@ code {
 
 .progress-table-row {
     content-visibility: auto;
+    max-width: 750px;
 }
 
 #matrix-table-body tr:nth-child(odd) {

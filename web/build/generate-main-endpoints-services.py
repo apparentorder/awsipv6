@@ -47,13 +47,13 @@ for row in cur.fetchall():
     html += f'''
         <tr
             class="progress-table-row"
-            xhx-get="endpoints-services-tooltip-{row['service_name']}.html"
-            xhx-target="#tooltip"
-            xhx-trigger="mouseenter"
-            xhx-swap="innerHTML"
+            hx-get="endpoints-services-tooltip-{row['service_name']}.html"
+            hx-target="#tooltip"
+            hx-trigger="mouseenter"
+            hx-swap="innerHTML"
         >
             <td>{row['service_name']}</td>
-            <td>
+            <td class="progress-bar-cell">
                 <div class="progress-bar">
                     <div class="progress-bar-segment endpoint-ipv6" style="width: {percentages['ipv6_default']:.1f}%" title="region count: {row['ipv6_default_count']} ({percentages['ipv6_default']:.1f}%)"></div>
                     <div class="progress-bar-segment endpoint-ipv6-dualstack" style="width: {percentages['ipv6_dualstack']:.1f}%" title="region count: {row['ipv6_dualstack_count']} ({percentages['ipv6_dualstack']:.1f}%)"></div>
@@ -84,14 +84,15 @@ for row in cur.fetchall():
             case _:
                 region_class[region['region_name']] = "endpoint-nx"
 
-    html_tooltip = ''
+    html_tooltip  = f'<div id="status-bar-content" class="p-2 grid grid-cols-1">'
     html_tooltip += f'<div class="font-semibold">{row['service_name']}</div>'
     html_tooltip += f'<div class="flex flex-wrap text-xs font-light">'
 
     for region in service_regions:
         html_tooltip += f'<span class="border px-3 text-nowrap border-gray-500 rounded-sm {region_class[region["region_name"]]}">{region["region_name"]}</span>\n'
 
-    html_tooltip += f'</div>'
+    html_tooltip += f'</div>' # service details / regions
+    html_tooltip += f'</div>' # stauts-bar-content
 
     open(f"output/endpoints-services-tooltip-{row['service_name']}.html", 'w').write(html_tooltip)
 
