@@ -131,20 +131,30 @@ function loadEndpointsTable() {
         for (const regionName of regionNamesOrdered) {
             const row = stmt.getAsObject([serviceName, regionName]);
             const td = tr.insertCell(-1);
+            const endpointClassDiv = td.appendChild(document.createElement('div'));
+            const endpointClassSpan = endpointClassDiv.appendChild(document.createElement('span'));
 
             if (row.endpoint_default_has_ipv6) {
                 td.classList.add('endpoint-ipv6');
-                td.innerHTML = 'IPv6';
+                endpointClassSpan.textContent = 'IPv6';
             } else if (row.endpoint_dualstack_has_ipv6) {
                 td.classList.add('endpoint-ipv6-dualstack');
-                td.innerHTML = 'opt-in';
+                endpointClassSpan.textContent = 'opt-in';
             } else if (row.endpoint_default_has_ipv4 || row.endpoint_dualstack_has_ipv4) {
                 td.classList.add('endpoint-ipv4');
-                td.innerHTML = 'IPv4';
+                endpointClassSpan.textContent = 'IPv4';
             } else {
                 td.classList.add('endpoint-nx');
-                td.innerHTML = '-';
+                endpointClassSpan.textContent = '-';
             }
+
+            // Those tooltips blow up and slow down the DOM massively.
+            // Alternative: Have just one <div> for the tooltip, then position and fill it dynamically
+            // on mouseover -- but then the fighting with JS starts again, instead of having nice clean
+            // CSS for the tooltip.
+
+            td.classList.add('tooltip-container');
+            td.appendChild(createTooltipDivForRow(row));
         }
     }
 
@@ -154,6 +164,76 @@ function loadEndpointsTable() {
     document.getElementById('matrix-table-caption').innerHTML = 'AWS Service APIs Public Endpoints';
 
     return;
+}
+
+function createTooltipDivForRow(row) {
+    const tooltipDiv = document.createElement('div');
+    tooltipDiv.classList.add('tooltip');
+
+    const table = tooltipDiv.appendChild(document.createElement('table'));
+
+    const caption = table.appendChild(document.createElement('caption'));
+    caption.textContent = `${row.service_name} @ ${row.region_name}`;
+    caption.classList.add("matrix-tooltip-head");
+
+    const tbody = table.appendChild(document.createElement('tbody'));
+    tbody.classList.add("matrix-tooltip-endpoints");
+
+    // -----
+
+    const trDefault = tbody.appendChild(document.createElement('tr'));
+
+    const tdDefault = trDefault.appendChild(document.createElement('td'));
+    tdDefault.textContent = "default";
+
+    const tdDefaultHostname = trDefault.appendChild(document.createElement('td'));
+    const codeDefaultHostname = tdDefaultHostname.appendChild(document.createElement('code'));
+    codeDefaultHostname.textContent = row.endpoint_default_hostname;
+
+    const tdDefaultExtra = trDefault.appendChild(document.createElement('td'));
+
+    if (row.endpoint_default_has_ipv6 && row.endpoint_default_has_ipv4) {
+        tdDefaultExtra.textContent = "IPv4, IPv6"
+        codeDefaultHostname.classList.add("endpoint-ipv6");
+    } else if (row.endpoint_default_has_ipv6) {
+        tdDefaultExtra.textContent = "IPv6 ONLY"
+        codeDefaultHostname.classList.add("endpoint-ipv6");
+    } else if (row.endpoint_default_has_ipv4) {
+        tdDefaultExtra.textContent = "IPv4"
+        codeDefaultHostname.classList.add("endpoint-ipv4");
+    } else {
+        tdDefaultExtra.textContent = "-"
+        codeDefaultHostname.classList.add("endpoint-nx");
+    }
+
+    // -----
+
+    const trDualstack = tbody.appendChild(document.createElement('tr'));
+
+    const tdDualstack = trDualstack.appendChild(document.createElement('td'));
+    tdDualstack.textContent = "dualstack (opt-in)";
+
+    const tdDualstackHostname = trDualstack.appendChild(document.createElement('td'));
+    const codeDualstackHostname = tdDualstackHostname.appendChild(document.createElement('code'));
+    codeDualstackHostname.textContent = row.endpoint_dualstack_hostname;
+
+    const tdDualstackExtra = trDualstack.appendChild(document.createElement('td'));
+
+    if (row.endpoint_dualstack_has_ipv6 && row.endpoint_dualstack_has_ipv4) {
+        tdDualstackExtra.textContent = "IPv4, IPv6"
+        codeDualstackHostname.classList.add("endpoint-ipv6-dualstack");
+    } else if (row.endpoint_dualstack_has_ipv6) {
+        tdDualstackExtra.textContent = "IPv6 ONLY"
+        codeDualstackHostname.classList.add("endpoint-ipv6-dualstack");
+    } else if (row.endpoint_dualstack_has_ipv4) {
+        tdDualstackExtra.textContent = "IPv4 ONLY"
+        codeDualstackHostname.classList.add("endpoint-ipv4");
+    } else {
+        tdDualstackExtra.textContent = "-"
+        codeDualstackHostname.classList.add("endpoint-nx");
+    }
+
+    return tooltipDiv;
 }
 
 function populateRegionDropdown() {
@@ -252,6 +332,9 @@ function filterServices(input) {
 document.addEventListener('click', function(event) {
     const dropdown = document.getElementById('region-dropdown');
     const input = document.getElementById('region-search');
+
+    if (!input) return;
+
     if (!input.contains(event.target) && !dropdown.contains(event.target)) {
         dropdown.classList.add('hidden');
         input.value = '';

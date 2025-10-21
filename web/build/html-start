@@ -16,7 +16,7 @@
 	<script defer src="uglyshit.js"></script>
 </head>
 
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen" hx-boost="true" hx-push-url="true">
 <div class="sticky top-0">
 	<header class="bg-orange-600 text-white text-center py-1 text-lg font-semibold">AWS Services IPv6 Support Information</header>
 	<nav class="bg-gray-100">
@@ -27,17 +27,17 @@
 			<div class="grid grid-cols-1 md:grid-cols-[auto_1fr] py-1">
 				<div><span class="font-semibold px-2 md:px-4">Service API endpoints:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
-					<li><a href="endpoints-overview.html" hx-get="endpoints-overview-main.html" hx-target="main" hx-push-url="endpoints-overview.html" class="hover:text-blue-600">Overview</a></li>
-					<li><a href="endpoints-services.html" hx-get="endpoints-services-main.html" hx-target="main" hx-push-url="endpoints-services.html" class="hover:text-blue-600">By Service</a></li>
-					<li><a href="endpoints-regions.html" hx-get="endpoints-regions-main.html" hx-target="main" hx-push-url="endpoints-regions.html" class="hover:text-blue-600">By Region</a></li>
-					<li><a href="endpoints-changes.html" hx-get="endpoints-changes-main.html" hx-target="main" hx-push-url="endpoints-changes.html" class="hover:text-blue-600">Changes</a></li>
-					<li><a href="endpoints-matrix.html" hx-get="endpoints-matrix-main.html" hx-target="main" hx-push-url="endpoints-matrix.html" class="hover:text-blue-600">Matrix</a></li>
+					<li><a href="endpoints-overview.html" class="hover:text-blue-600">Overview</a></li>
+					<li><a href="endpoints-services.html" class="hover:text-blue-600">By Service</a></li>
+					<li><a href="endpoints-regions.html" class="hover:text-blue-600">By Region</a></li>
+					<li><a href="endpoints-changes.html" class="hover:text-blue-600">Changes</a></li>
+					<li><a href="endpoints-matrix.html" class="hover:text-blue-600">Matrix</a></li>
 				</ul></div>
 				<div><span class="font-semibold px-2 md:px-4">Other resources:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
-					<li><a href="endpoints-overview.html" hx-get="endpoints-overview-main.html" hx-target="main" hx-push-url="endpoints-overview.html" class="hover:text-blue-600">Other Foo</a></li>
-					<li><a href="endpoints-overview.html" hx-get="endpoints-overview-main.html" hx-target="main" hx-push-url="endpoints-overview.html" class="hover:text-blue-600">Misc. Bar</a></li>
-					<li><a href="endpoints-overview.html" hx-get="endpoints-overview-main.html" hx-target="main" hx-push-url="endpoints-overview.html" class="hover:text-blue-600">Contact</a></li>
+					<li><a href="endpoints-overview.html" class="hover:text-blue-600">Other Foo</a></li>
+					<li><a href="endpoints-overview.html" class="hover:text-blue-600">Misc. Bar</a></li>
+					<li><a href="endpoints-overview.html" class="hover:text-blue-600">Contact</a></li>
 				</ul></div>
 			</div>
 		</div>

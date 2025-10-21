@@ -14,28 +14,29 @@ cur = epdb.execute("""
         r.description as region_description,
         sum(endpoint_default_has_ipv6) as ipv6_default_count,
         sum(case when endpoint_dualstack_has_ipv6 and not endpoint_default_has_ipv6 then 1 else 0 end) as ipv6_dualstack_count,
-        sum(case when endpoint_default_has_ipv4 and not endpoint_default_has_ipv6 and not endpoint_dualstack_has_ipv6 then 1 else 0 end) as ipv4_count,
-        sum(case when endpoint_default_has_ipv4 or endpoint_dualstack_has_ipv4 then 1 else 0 end) as count_all
+        sum(case when endpoint_default_has_ipv4 and not endpoint_default_has_ipv6 and not endpoint_dualstack_has_ipv6 then 1 else 0 end) as ipv4_count
     FROM endpoint e
     LEFT JOIN region r ON e.region_name = r.region_name
     GROUP BY r.partition_name, r.region_name, region_description
-    HAVING count_all > 0
     ORDER BY
-        --(ipv6_default_count*5 + ipv6_dualstack_count*3 - ipv4_count*10)*100/count_all DESC
-        -- ipv4_count*100/count_all ASC,
-        -- ipv6_default_count*100/count_all DESC
         region_name
 """)
+
+count_all = epdb.execute("SELECT COUNT(DISTINCT service_name) FROM ENDPOINT").fetchone()[0];
 
     # ORDER BY (sum(endpoint_default_has_ipv6) * 100.0 / sum(case when endpoint_default_has_ipv4 then 1 else 0 end)) DESC,
     #          (sum(case when endpoint_dualstack_has_ipv6 and not endpoint_default_has_ipv6 then 1 else 0 end) * 100.0 / sum(case when endpoint_default_has_ipv4 then 1 else 0 end)) DESC
 html = f'''
     <!-- file: {os.path.basename(__file__)} -->
     <table class="progress-table font-light">
-        <tr class="text-left">
-            <th>Region</th>
-            <th>IPv6 support &mdash; by default / opt-in / ipv4-only</th>
-        </tr>
+        <thead>
+            <tr class="text-left">
+                <th>Region</th>
+                <th>IPv6 support per service &mdash; by default / opt-in / ipv4-only</th>
+            </tr>
+        </thead>
+
+        <tbody>
 '''
 
 for row in cur.fetchall():
@@ -47,16 +48,18 @@ for row in cur.fetchall():
 
     percentages = {}
     for cat in ['ipv6_default', 'ipv6_dualstack', 'ipv4']:
-        percentages[cat] = row[f'{cat}_count'] * 100 / row['count_all']
+        percentages[cat] = row[f'{cat}_count'] * 100 / count_all
+
+    # percentages["nx"] = 100 - sum(percentages.values())
 
     html += f'''
-        <tr>
+        <tr class="progress-table-row">
             <td>{region_name}</td>
-            <td>
+            <td class="progress-table-cell">
                 <div class="progress-bar">
-                    <div class="progress-bar-segment endpoint-ipv6" style="width: {percentages['ipv6_default']:.1f}%" title="service count: {row['ipv6_default_count']} ({percentages['ipv6_default']:.1f}%)"></div>
-                    <div class="progress-bar-segment endpoint-ipv6-dualstack" style="width: {percentages['ipv6_dualstack']:.1f}%" title="service count: {row['ipv6_dualstack_count']} ({percentages['ipv6_dualstack']:.1f}%)"></div>
-                    <div class="progress-bar-segment endpoint-ipv4" style="width: {percentages['ipv4']:.1f}%" title="service count: {row['ipv4_count']} ({percentages['ipv4']:.1f}%)"></div>
+                    <div class="progress-bar-segment endpoint-ipv6" style="width: {percentages['ipv6_default']:.1f}%" title="service count ipv6-default: {row['ipv6_default_count']} ({percentages['ipv6_default']:.1f}%)"></div>
+                    <div class="progress-bar-segment endpoint-ipv6-dualstack" style="width: {percentages['ipv6_dualstack']:.1f}%" title="service count ipv6-opt-in: {row['ipv6_dualstack_count']} ({percentages['ipv6_dualstack']:.1f}%)"></div>
+                    <div class="progress-bar-segment endpoint-ipv4" style="width: {percentages['ipv4']:.1f}%" title="service count ipv4-only: {row['ipv4_count']} ({percentages['ipv4']:.1f}%)"></div>
                 </div>
             </td>
         </tr>

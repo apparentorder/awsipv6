@@ -17,18 +17,15 @@ cur = epdb.execute("""
         sum(case when endpoint_default_has_ipv4 or endpoint_dualstack_has_ipv4 then 1 else 0 end) as count_active
     FROM endpoint
     GROUP BY service_name
-    HAVING count_active
+    HAVING count_active > 0
     ORDER BY
-        --(ipv6_default_count*15 + ipv6_dualstack_count*3 - ipv4_count*7)*100/count_active DESC,
         service_name
 """)
 
 html = f'''
     <!-- file: {os.path.basename(__file__)} -->
 
-    <script defer src="tooltip.js"></script>
-
-    <table class="progress-table font-light">
+    <table class="progress-table font-light" hx-push-url="false">
         <thead>
             <tr class="text-left">
                 <th>Service</th>
@@ -45,19 +42,20 @@ for row in cur.fetchall():
         percentages[cat] = row[f'{cat}_count'] * 100 / region_count
 
     html += f'''
-        <tr
-            class="progress-table-row"
-            hx-get="endpoints-services-tooltip-{row['service_name']}.html"
-            hx-target="#tooltip"
-            hx-trigger="mouseenter"
-            hx-swap="innerHTML"
-        >
+        <tr class="progress-table-row">
             <td>{row['service_name']}</td>
-            <td class="progress-bar-cell">
-                <div class="progress-bar">
-                    <div class="progress-bar-segment endpoint-ipv6" style="width: {percentages['ipv6_default']:.1f}%" title="region count: {row['ipv6_default_count']} ({percentages['ipv6_default']:.1f}%)"></div>
-                    <div class="progress-bar-segment endpoint-ipv6-dualstack" style="width: {percentages['ipv6_dualstack']:.1f}%" title="region count: {row['ipv6_dualstack_count']} ({percentages['ipv6_dualstack']:.1f}%)"></div>
-                    <div class="progress-bar-segment endpoint-ipv4" style="width: {percentages['ipv4']:.1f}%" title="region count: {row['ipv4_count']} ({percentages['ipv4']:.1f}%)"></div>
+            <td class="progress-table-cell">
+                <div
+                    class="progress-bar tooltip-container"
+                    hx-get="endpoints-services-tooltip-{row['service_name']}.html"
+                    hx-target="#service-tooltip-{row['service_name']}"
+                    hx-trigger="mouseover once"
+                    hx-swap="innerHTML"
+                >
+                    <div class="progress-bar-segment endpoint-ipv6" style="width: {percentages['ipv6_default']:.1f}%" title="service count ipv6-default: {row['ipv6_default_count']} ({percentages['ipv6_default']:.1f}%)"></div>
+                    <div class="progress-bar-segment endpoint-ipv6-dualstack" style="width: {percentages['ipv6_dualstack']:.1f}%" title="service count ipv6-opt-in: {row['ipv6_dualstack_count']} ({percentages['ipv6_dualstack']:.1f}%)"></div>
+                    <div class="progress-bar-segment endpoint-ipv4" style="width: {percentages['ipv4']:.1f}%" title="service count ipv4-only: {row['ipv4_count']} ({percentages['ipv4']:.1f}%)"></div>
+                    <div id="service-tooltip-{row['service_name']}" class="tooltip">Loading ...</div>
                 </div>
             </td>
         </tr>

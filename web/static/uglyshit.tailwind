@@ -91,9 +91,8 @@ code {
     @apply bg-gray-200;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
     display: flex;
-    max-width: 500px;
+    @apply w-full max-w-[500px];
     height: 12px;
-    @apply w-full;
 }
 
 .progress-bar-segment {
@@ -118,7 +117,7 @@ code {
 }
 
 .progress-table td:nth-child(2) {
-    @apply size-full;
+    @apply w-full;
 }
 
 .progress-table-row {
@@ -139,4 +138,28 @@ code {
 
 .matrix-table-row {
     content-visibility: auto;
+}
+
+.matrix-tooltip-head {
+    @apply text-sm text-left font-semibold;
+}
+
+.matrix-tooltip-endpoints {
+    @apply text-sm text-left font-light p-1 size-fit;
+}
+
+.matrix-tooltip-endpoints code {
+    @apply font-semibold;
+}
+
+.tooltip-container:hover .tooltip {
+    visibility: visible;
+    z-index: 50;
+    transition-delay: 200ms;
+}
+
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    @apply border border-gray-300 bg-gray-100 rounded shadow-lg p-1 mt-8 w-auto max-w-[1000px];
 }
