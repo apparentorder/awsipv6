@@ -41,14 +41,15 @@ html = f'''
 
             <div id="matrix-table-container"></div>
                 <table id="matrix-table" class="text-center text-xs w-full table-auto whitespace-nowrap">
-                    <caption id="matrix-table-caption" class="text-lg font-semibold"></caption>
+                    <caption id="matrix-table-caption" class="text-lg font-semibold">
+                        <-- js -->
+                    </caption>
                     <thead id="matrix-table-head" class="border-b text-sm">
-                        <tr id="matrix-table-head-row">
-                            <th>Service</th>
-                        </tr>
+                        <!-- js -->
                     </thead>
 
                     <tbody id="matrix-table-body" class="text-center font-light">
+                        <!-- js -->
                     </tbody>
                 </table>
             </div>

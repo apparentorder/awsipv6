@@ -25,7 +25,7 @@ cur = epdb.execute("""
 html = f'''
     <!-- file: {os.path.basename(__file__)} -->
 
-    <table class="progress-table font-light" hx-push-url="false">
+    <table class="progress-table font-light">
         <thead>
             <tr class="text-left">
                 <th>Service</th>

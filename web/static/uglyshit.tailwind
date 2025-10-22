@@ -120,8 +120,8 @@ code {
     @apply w-full;
 }
 
-.progress-table-row {
-    content-visibility: auto;
+#matrix-table-head th {
+  @apply text-center px-1;
 }
 
 #matrix-table-body tr:nth-child(odd) {
@@ -134,10 +134,6 @@ code {
 
 #matrix-table-body td {
   @apply border border-1 border-dotted border-gray-300;
-}
-
-.matrix-table-row {
-    content-visibility: auto;
 }
 
 .matrix-tooltip-head {

@@ -54,11 +54,10 @@ function setSelectedRegions(regionList) {
 }
 
 function initRegions() {
-
     try {
         setSelectedRegions(JSON.parse(window.localStorage.getItem('regionSelection')));
     } catch(_) {
-        setSelectedRegions(defaultRegionSelection);
+        setSelectedRegions(undefined);
     }
 
     const res = this.endpointsSqliteDatabase.exec(`
@@ -77,12 +76,7 @@ function initRegions() {
 }
 
 function loadEndpointsTable() {
-    // Clear existing table content
-    const headTr = document.getElementById('matrix-table-head-row');
-    while (headTr.children.length > 1) { // Keep the first 'Service' th
-        headTr.removeChild(headTr.lastChild);
-    }
-    document.getElementById('matrix-table-body').innerHTML = '';
+    document.getElementById('matrix-table-caption').textContent = 'Loading EPDB ...';
 
     const regionNamesOrdered = this.endpointsSqliteDatabase.exec(`
         SELECT region_name
@@ -96,14 +90,6 @@ function loadEndpointsTable() {
         FROM endpoint
         ORDER BY service_name
     `)[0].values.map(r => r[0]);
-
-    for (const regionName of regionNamesOrdered) {
-        const th = headTr.appendChild(document.createElement('th'));
-        th.innerHTML = regionName;
-        th.classList.add('px-1');
-    }
-
-    // -----
 
     const stmt = this.endpointsSqliteDatabase.prepare(`
         SELECT
@@ -120,13 +106,21 @@ function loadEndpointsTable() {
         AND e.region_name = ?
     `);
 
+    // -----
+
+    const headTr = document.createElement('tr');
+    headTr.appendChild(document.createElement('th')).textContent = "Service";
+
+    for (const regionName of regionNamesOrdered) {
+        const th = headTr.appendChild(document.createElement('th'));
+        th.textContent = regionName;
+    }
+
     const fragment = document.createDocumentFragment();
     for (const serviceName of serviceNamesOrdered) {
         const tr = fragment.appendChild(document.createElement('tr'));
-        tr.classList.add("matrix-table-row");
 
-        const th = tr.appendChild(document.createElement('th'));
-        th.innerHTML = serviceName;
+        tr.appendChild(document.createElement('th')).textContent = serviceName;
 
         for (const regionName of regionNamesOrdered) {
             const row = stmt.getAsObject([serviceName, regionName]);
@@ -160,8 +154,9 @@ function loadEndpointsTable() {
 
     stmt.free();
 
-    document.getElementById('matrix-table-body').appendChild(fragment);
-    document.getElementById('matrix-table-caption').innerHTML = 'AWS Service APIs Public Endpoints';
+    document.getElementById('matrix-table-head').replaceChildren(headTr);
+    document.getElementById('matrix-table-body').replaceChildren(fragment);
+    document.getElementById('matrix-table-caption').textContent = 'AWS Service APIs Public Endpoints';
 
     return;
 }

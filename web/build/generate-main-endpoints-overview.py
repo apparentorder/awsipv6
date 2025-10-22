@@ -60,7 +60,7 @@ pie_conic_gradient_str = ", ".join(parts)
 
 html = f'''
     <!-- file: {os.path.basename(__file__)} -->
-    <div class="flex flex-col md:flex-row gap-4">
+    <div class="flex flex-col md:flex-row gap-4" hx-boost="true" hx-push-url="true">
         <div class="max-w-prose">
             <p class="text-lg">
                 This summary chart shows how many AWS services support IPv6 client applications

@@ -16,28 +16,28 @@
 	<script defer src="uglyshit.js"></script>
 </head>
 
-<body class="flex flex-col min-h-screen" hx-boost="true" hx-push-url="true">
+<body class="flex flex-col min-h-screen">
 <div class="sticky top-0">
-	<header class="bg-orange-600 text-white text-center py-1 text-lg font-semibold">AWS Services IPv6 Support Information</header>
-	<nav class="bg-gray-100">
-		<button class="md:hidden p-1 text-base" onclick="document.getElementById('nav-content').classList.toggle('hidden')">
+	<header class="bg-orange-600 text-white text-center text-lg py-1 font-semibold">AWS Services IPv6 Support Information</header>
+	<nav class="bg-gray-100" hx-boost="true" hx-push-url="true">
+		<button class="md:hidden p-1" onclick="document.getElementById('nav-content').classList.toggle('hidden')">
 			☰ Navigation
 		</button>
 		<div id="nav-content" class="hidden md:block">
 			<div class="grid grid-cols-1 md:grid-cols-[auto_1fr] py-1">
 				<div><span class="font-semibold px-2 md:px-4">Service API endpoints:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
-					<li><a href="endpoints-overview.html" class="hover:text-blue-600">Overview</a></li>
-					<li><a href="endpoints-services.html" class="hover:text-blue-600">By Service</a></li>
-					<li><a href="endpoints-regions.html" class="hover:text-blue-600">By Region</a></li>
-					<li><a href="endpoints-changes.html" class="hover:text-blue-600">Changes</a></li>
-					<li><a href="endpoints-matrix.html" class="hover:text-blue-600">Matrix</a></li>
+					<li><a href="endpoints-overview.html">Overview</a></li>
+					<li><a href="endpoints-services.html">By Service</a></li>
+					<li><a href="endpoints-regions.html">By Region</a></li>
+					<li><a href="endpoints-changes.html">Changes</a></li>
+					<li><a href="endpoints-matrix.html">Matrix</a></li>
 				</ul></div>
 				<div><span class="font-semibold px-2 md:px-4">Other resources:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
-					<li><a href="endpoints-overview.html" class="hover:text-blue-600">Other Foo</a></li>
-					<li><a href="endpoints-overview.html" class="hover:text-blue-600">Misc. Bar</a></li>
-					<li><a href="endpoints-overview.html" class="hover:text-blue-600">Contact</a></li>
+					<li><a href="endpoints-overview.html">Other Foo</a></li>
+					<li><a href="endpoints-overview.html">Misc. Bar</a></li>
+					<li><a href="endpoints-overview.html">Contact</a></li>
 				</ul></div>
 			</div>
 		</div>
