@@ -42,7 +42,7 @@ html = f'''
             <div id="matrix-table-container"></div>
                 <table id="matrix-table" class="text-center text-xs w-full table-auto whitespace-nowrap">
                     <caption id="matrix-table-caption" class="text-lg font-semibold">
-                        <-- js -->
+                        <!-- js -->
                     </caption>
                     <thead id="matrix-table-head" class="border-b text-sm">
                         <!-- js -->
