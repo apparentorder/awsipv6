@@ -78,12 +78,12 @@ function initRegions() {
 function loadEndpointsTable() {
     document.getElementById('matrix-table-caption').textContent = 'Loading EPDB ...';
 
-    const regionNamesOrdered = this.endpointsSqliteDatabase.exec(`
-        SELECT region_name
+    const regionsOrdered = this.endpointsSqliteDatabase.exec(`
+        SELECT region_name, description
         FROM region
         WHERE selected = 1
         ORDER BY region_name
-    `)[0].values.map(r => r[0]);
+    `)[0].values;
 
     const serviceNamesOrdered = this.endpointsSqliteDatabase.exec(`
         SELECT DISTINCT service_name
@@ -111,9 +111,13 @@ function loadEndpointsTable() {
     const headTr = document.createElement('tr');
     headTr.appendChild(document.createElement('th')).textContent = "Service";
 
-    for (const regionName of regionNamesOrdered) {
+    for (const region of regionsOrdered) {
         const th = headTr.appendChild(document.createElement('th'));
-        th.textContent = regionName;
+        const regionDiv = th.appendChild(document.createElement('div'));
+        const descrDiv = th.appendChild(document.createElement('div'));
+        regionDiv.textContent = region[0];
+        descrDiv.textContent = region[1];
+        descrDiv.classList.add("text-xs", "text-gray-500", "font-light");
     }
 
     const fragment = document.createDocumentFragment();
@@ -122,8 +126,8 @@ function loadEndpointsTable() {
 
         tr.appendChild(document.createElement('th')).textContent = serviceName;
 
-        for (const regionName of regionNamesOrdered) {
-            const row = stmt.getAsObject([serviceName, regionName]);
+        for (const region of regionsOrdered) {
+            const row = stmt.getAsObject([serviceName, region[0]]);
             const td = tr.insertCell(-1);
             const endpointClassDiv = td.appendChild(document.createElement('div'));
             const endpointClassSpan = endpointClassDiv.appendChild(document.createElement('span'));
