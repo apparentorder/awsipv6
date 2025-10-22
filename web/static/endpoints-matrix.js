@@ -1,7 +1,7 @@
 async function initSqliteFile() {
     if (this.endpointsSqliteDatabase) return; // already loaded
 
-    document.getElementById('matrix-table-caption').innerHTML = 'Loading EPDB ...';
+    document.getElementById('matrix-table-caption').textContent = 'Fetching EPDB ...';
 
     const [fetchResponse, SQL] = await Promise.all([
         fetch('endpoints.sqlite--but.cloudfront.does.not.want.to.compress.binary.data.so.lets.just.call.it.xml'),
@@ -9,17 +9,12 @@ async function initSqliteFile() {
     ]);
 
     if (!fetchResponse.ok) {
-        document.getElementById('matrix-table-caption').innerHTML = 'Could not load SQLite file.';
+        document.getElementById('matrix-table-caption').textContent = 'Could not load SQLite file.';
         return;
     }
 
     const dbFileContents = new Uint8Array(await fetchResponse.arrayBuffer());
     this.endpointsSqliteDatabase = new SQL.Database(dbFileContents);
-
-    this.endpointsSqliteDatabase.run(`
-        ALTER TABLE region
-        ADD COLUMN selected INTEGER DEFAULT 0
-    `);
 
     initRegions();
 }
@@ -46,11 +41,6 @@ function setSelectedRegions(regionList) {
 
     this.selectedRegions = [... new Set(regionList)];
     window.localStorage.setItem('regionSelection', JSON.stringify(this.selectedRegions));
-
-    this.endpointsSqliteDatabase.run("UPDATE region SET selected = 0");
-    for (const regionName of regionList) {
-        this.endpointsSqliteDatabase.run("UPDATE region SET selected = 1 WHERE region_name = ?", [regionName]);
-    }
 }
 
 function initRegions() {
@@ -69,21 +59,16 @@ function initRegions() {
     this.allRegions = {};
     for (const row of res[0].values) {
         const [regionName, partitionName, description] = row;
-        this.allRegions[regionName] = { regionName, partitionName, description };
+        const geoMatch = description.match(/\((.*)\)\s*$/);
+        const shortDescription = geoMatch ? geoMatch[1] : description;
+        this.allRegions[regionName] = { regionName, partitionName, description, shortDescription };
     }
-
-    populateRegionDropdown();
 }
 
 function loadEndpointsTable() {
     document.getElementById('matrix-table-caption').textContent = 'Loading EPDB ...';
 
-    const regionsOrdered = this.endpointsSqliteDatabase.exec(`
-        SELECT region_name, description
-        FROM region
-        WHERE selected = 1
-        ORDER BY region_name
-    `)[0].values;
+    const regionNamesOrdered = this.selectedRegions.toSorted();
 
     const serviceNamesOrdered = this.endpointsSqliteDatabase.exec(`
         SELECT DISTINCT service_name
@@ -111,12 +96,14 @@ function loadEndpointsTable() {
     const headTr = document.createElement('tr');
     headTr.appendChild(document.createElement('th')).textContent = "Service";
 
-    for (const region of regionsOrdered) {
+    for (const regionName of regionNamesOrdered) {
+        const region = this.allRegions[regionName];
+
         const th = headTr.appendChild(document.createElement('th'));
         const regionDiv = th.appendChild(document.createElement('div'));
         const descrDiv = th.appendChild(document.createElement('div'));
-        regionDiv.textContent = region[0];
-        descrDiv.textContent = region[1];
+        regionDiv.textContent = region.regionName;
+        descrDiv.textContent = region.shortDescription;
         descrDiv.classList.add("text-xs", "text-gray-500", "font-light");
     }
 
@@ -126,8 +113,8 @@ function loadEndpointsTable() {
 
         tr.appendChild(document.createElement('th')).textContent = serviceName;
 
-        for (const region of regionsOrdered) {
-            const row = stmt.getAsObject([serviceName, region[0]]);
+        for (const regionName of regionNamesOrdered) {
+            const row = stmt.getAsObject([serviceName, regionName]);
             const td = tr.insertCell(-1);
             const endpointClassDiv = td.appendChild(document.createElement('div'));
             const endpointClassSpan = endpointClassDiv.appendChild(document.createElement('span'));
@@ -247,12 +234,14 @@ function populateRegionDropdown() {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.value = regionName;
+        console.log("XXX");
+        console.log(regionName);
+        console.log(JSON.stringify(this.selectedRegions, null, 4));
         checkbox.checked = this.selectedRegions.includes(regionName);
         checkbox.onchange = () => handleRegionChange();
 
         const span = document.createElement('span');
-        const geoMatch = region.description.match(/\((.*)\)\s*$/);
-        span.textContent = geoMatch ? `${regionName} (${geoMatch[1]})` : regionName;
+        span.textContent = `${region.regionName} (${region.shortDescription})`;
         span.className = 'px-1';
 
         label.appendChild(checkbox);
@@ -265,8 +254,8 @@ function populateRegionDropdown() {
     buttonContainer.className = 'flex justify-between px-2 py-2 border-t sticky bottom-0 bg-white';
 
     const selectAllBtn = document.createElement('button');
-    selectAllBtn.textContent = 'Select All';
-    selectAllBtn.className = 'text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600';
+    selectAllBtn.textContent = 'Select All (Bad Idea)';
+    selectAllBtn.className = 'text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600';
     selectAllBtn.onclick = () => {
         const visibleLabels = dropdown.querySelectorAll('label:not([style*="display: none"])');
         visibleLabels.forEach(label => {
@@ -358,4 +347,5 @@ document.addEventListener('keydown', function(event) {
 
 initSqliteFile().then(() => {
     loadEndpointsTable();
+    populateRegionDropdown();
 });
