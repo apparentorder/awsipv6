@@ -12,4 +12,4 @@ html_out = '''
     </div>
 '''
 
-open("output/endpoints-changes-main.html", 'w').write(html_out)
+open("output/egress-main.html", 'w').write(html_out)

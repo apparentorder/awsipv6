@@ -16,4 +16,4 @@ html_out = '''
     </div>
 '''
 
-open("output/endpoints-changes-main.html", 'w').write(html_out)
+open("output/intro-main.html", 'w').write(html_out)

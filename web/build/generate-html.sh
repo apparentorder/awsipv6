@@ -17,12 +17,12 @@ page_list="
 "
 
 for page in $page_list; do
-    python3 "web/build/generate-main-endpoints-${page}.py" "$@"
+    python3 "web/build/generate-main-${page}.py" "$@"
 
     # This may be the first time in history that `cat` is used to CONCATENATE files.
     cat \
         web/build/html-start \
-        "output/endpoints-${page}-main.html" \
+        "output/${page}-main.html" \
         web/build/html-end \
-        > "output/endpoints-$page.html"
+        > "output/$page.html"
 done
