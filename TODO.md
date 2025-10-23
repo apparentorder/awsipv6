@@ -14,3 +14,5 @@
 - event handling dropdowns etc: replace some JS with hx-*?
 
 - matrix: virtual scrolling?
+
+- fix layout for compact navigation (mobile), add close-after-click
