@@ -10,7 +10,7 @@ html_out = '''
     <div class="text-xs text-gray-500 font-light max-w-prose">
         This list is presented in <code>diff</code>-style output: Every
         endpoint beginning with a <code>+</code> was added, and every
-        endpoint beginning with a <code>-</code> was removed &mdash; or
+        endpoint beginning with a <code>-</code> was removed &ndash; or
         changed, when paired with a <code>+</code> line.
     </div>
 
@@ -21,6 +21,7 @@ with open("output/changes") as f:
     data_tags_open = False
     date_count = 0
     for line in f.readlines():
+        line = line.strip()
         if re.match(r'^\d', line):
             if data_tags_open:
                 html_out += '</ul>'

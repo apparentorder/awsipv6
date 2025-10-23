@@ -25,6 +25,14 @@
 		</button>
 		<div id="nav-content" class="hidden md:block">
 			<div class="grid grid-cols-1 md:grid-cols-[auto_1fr] py-1">
+				<div><span class="font-semibold px-2 md:px-4">IPv6 resources:</span></div>
+				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
+					<li><a href="intro.html">Introduction</a></li>
+					<li><a href="ingress.html">Ingress</a></li>
+					<li><a href="egress.html">Egress</a></li>
+					<li><a href="sdk-programming.html">SDK Programming</a></li>
+					<li><a href="faq.html">FAQ</a></li>
+				</ul></div>
 				<div><span class="font-semibold px-2 md:px-4">Service API endpoints:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
 					<li><a href="endpoints-overview.html">Overview</a></li>
@@ -32,12 +40,6 @@
 					<li><a href="endpoints-regions.html">By Region</a></li>
 					<li><a href="endpoints-changes.html">Changes</a></li>
 					<li><a href="endpoints-matrix.html">Matrix</a></li>
-				</ul></div>
-				<div><span class="font-semibold px-2 md:px-4">Other resources:</span></div>
-				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
-					<li><a href="endpoints-overview.html">Other Foo</a></li>
-					<li><a href="endpoints-overview.html">Misc. Bar</a></li>
-					<li><a href="endpoints-overview.html">Contact</a></li>
 				</ul></div>
 			</div>
 		</div>

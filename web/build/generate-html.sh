@@ -2,7 +2,21 @@
 
 set -e
 
-for page in overview regions services matrix changes; do
+page_list="
+    intro
+    ingress
+    egress
+    sdk-programming
+    faq
+
+    endpoints-overview
+    endpoints-regions
+    endpoints-services
+    endpoints-matrix
+    endpoints-changes
+"
+
+for page in $page_list; do
     python3 "web/build/generate-main-endpoints-${page}.py" "$@"
 
     # This may be the first time in history that `cat` is used to CONCATENATE files.
