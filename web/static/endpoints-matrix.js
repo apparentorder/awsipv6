@@ -30,12 +30,14 @@ function setSelectedRegions(regionList) {
 
     if (!regionList || !Array.isArray(regionList) || regionList.length === 0) {
         regionList = [
-            'us-east-1', 'us-west-1',
+            'ap-southeast-2',
             'ca-central-1',
-            'eu-central-1',
             'cn-north-1',
+            'eu-central-1',
+            'il-central-1',
+            'us-east-1',
             'us-gov-west-1',
-            'eusc-de-east-1',
+            'us-west-1',
         ];
     }
 
@@ -234,11 +236,8 @@ function populateRegionDropdown() {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.value = regionName;
-        console.log("XXX");
-        console.log(regionName);
-        console.log(JSON.stringify(this.selectedRegions, null, 4));
         checkbox.checked = this.selectedRegions.includes(regionName);
-        checkbox.onchange = () => handleRegionChange();
+        checkbox.onchange = handleRegionChange;
 
         const span = document.createElement('span');
         span.textContent = `${region.regionName} (${region.shortDescription})`;
@@ -254,33 +253,31 @@ function populateRegionDropdown() {
     buttonContainer.className = 'flex justify-between px-2 py-2 border-t sticky bottom-0 bg-white';
 
     const selectAllBtn = document.createElement('button');
-    selectAllBtn.textContent = 'Select All (Bad Idea)';
-    selectAllBtn.className = 'text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600';
-    selectAllBtn.onclick = () => {
-        const visibleLabels = dropdown.querySelectorAll('label:not([style*="display: none"])');
+    selectAllBtn.textContent = 'Select all matching';
+    selectAllBtn.className = 'text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600';
+    selectAllBtn.onclick = (() => {
+        const visibleLabels = document.querySelectorAll('#region-dropdown label:not([style*="display: none"])');
         visibleLabels.forEach(label => {
             const checkbox = label.querySelector('input[type="checkbox"]');
             if (checkbox) checkbox.checked = true;
         });
         handleRegionChange();
-    };
+    });
 
     const resetBtn = document.createElement('button');
     resetBtn.textContent = 'Reset';
     resetBtn.className = 'text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600';
-    resetBtn.onclick = () => {
-        // Reset to default region selection
+    resetBtn.onclick = (() => {
+        // nb: can't use handleRegionChange() here, as it uses the currently-selected boxes
         setSelectedRegions(null);
         loadEndpointsTable();
-        populateRegionDropdown(); // Refresh checkboxes to show correct state
-    };
+        populateRegionDropdown();
+    });
 
     buttonContainer.appendChild(selectAllBtn);
     buttonContainer.appendChild(resetBtn);
     dropdown.appendChild(buttonContainer);
 }
-
-// Dropdown toggle now handled by HTMX inline event
 
 function filterRegions() {
     const input = document.getElementById('region-search');
@@ -300,7 +297,7 @@ function handleRegionChange() {
     const checkboxes = document.querySelectorAll('#region-dropdown input[type="checkbox"]');
     const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
     setSelectedRegions(selected);
-    loadEndpointsTable(); // Reload the table with new selection
+    loadEndpointsTable();
     const input = document.getElementById('region-search');
     input.focus();
     input.select();
@@ -316,7 +313,7 @@ function filterServices(input) {
     }
 }
 
-// Close dropdown when clicking outside or pressing Escape
+// Close dropdown when clicking outside
 document.addEventListener('click', function(event) {
     const dropdown = document.getElementById('region-dropdown');
     const input = document.getElementById('region-search');
@@ -333,16 +330,16 @@ document.addEventListener('click', function(event) {
 });
 
 document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        const activeElement = document.activeElement;
-        const regionSearch = document.getElementById('region-search');
-
+    if (event.key !== 'Escape' || event.target.id !== "region-search") {
         // Only handle escape for the region search input
-        if (activeElement === regionSearch) {
-            document.getElementById('region-dropdown').classList.add('hidden');
-            regionSearch.value = '';
-        }
+        return;
     }
+
+    event.target.value = '';
+    document.getElementById('region-dropdown').classList.add('hidden');
+    document.querySelectorAll('#region-dropdown label').forEach(label => {
+        label.style.display = '';
+    });
 });
 
 initSqliteFile().then(() => {

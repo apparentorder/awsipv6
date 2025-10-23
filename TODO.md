@@ -16,3 +16,5 @@
 - matrix: virtual scrolling?
 
 - fix layout for compact navigation (mobile), add close-after-click
+
+- add click-to-copy for matrix tooltip hostnames
