@@ -21,3 +21,5 @@
 - add click-to-copy for matrix tooltip hostnames
 
 - data generation: throw away python classes crap and just use sqlite
+
+- html output: pretty print e.g. beautifulsoup4

@@ -10,28 +10,28 @@
 	<meta property="og:description" content="IPv6 support information for all AWS services, regions and endpoints">
 	<meta property="og:image" content="https://awsipv6.neveragain.de/og-image.png">
 	<meta property="og:type" content="website">
-	<link rel="stylesheet" href="uglyshit.css">
-	<link rel="stylesheet" href="fonts.css">
-	<script defer src="htmx.min.js"></script>
-	<script defer src="uglyshit.js"></script>
+	<link rel="stylesheet" href="assets/uglyshit.css">
+	<link rel="stylesheet" href="assets/fonts.css">
+	<script defer src="assets/htmx.min.js"></script>
 </head>
 
 <body class="flex flex-col min-h-screen">
 <div class="sticky top-0">
 	<header class="bg-orange-600 text-white text-center text-lg py-1 font-semibold">AWS Services IPv6 Support Information</header>
 	<nav class="bg-gray-100" hx-boost="true" hx-push-url="true">
-		<button class="md:hidden p-1" onclick="document.getElementById('nav-content').classList.toggle('hidden')">
+		<button class="md:hidden p-1" hx-on:click="document.getElementById('nav-content').classList.toggle('hidden')">
 			☰ Navigation
 		</button>
 		<div id="nav-content" class="hidden md:block">
 			<div class="grid grid-cols-1 md:grid-cols-[auto_1fr] py-1">
-				<div><span class="font-semibold px-2 md:px-4">IPv6 resources:</span></div>
+				<div><span class="font-semibold px-2 md:px-4">AWS IPv6 Basics:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
 					<li><a href="intro.html">Introduction</a></li>
 					<li><a href="ingress.html">Ingress</a></li>
 					<li><a href="egress.html">Egress</a></li>
-					<li><a href="sdk-programming.html">SDK Programming</a></li>
+					<li><a href="sdk-programming.html">Programming/SDK</a></li>
 					<li><a href="faq.html">FAQ</a></li>
+					<li><a href="resources.html">Resources</a></li>
 				</ul></div>
 				<div><span class="font-semibold px-2 md:px-4">Service API endpoints:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">

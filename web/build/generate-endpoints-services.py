@@ -22,7 +22,9 @@ cur = epdb.execute("""
         service_name
 """)
 
-html = f'''
+html = open("web/build/html-start", "r").read()
+
+html += f'''
     <!-- file: {os.path.basename(__file__)} -->
 
     <table class="progress-table font-light">
@@ -97,4 +99,6 @@ for row in cur.fetchall():
 html += '</tbody>\n'
 html += '</table>\n'
 
-open("output/endpoints-services-main.html", 'w').write(html)
+html += open("web/build/html-end", "r").read()
+
+open("output/endpoints-services.html", 'w').write(html)

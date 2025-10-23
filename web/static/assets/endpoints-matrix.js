@@ -4,8 +4,8 @@ async function initSqliteFile() {
     document.getElementById('matrix-table-caption').textContent = 'Fetching EPDB ...';
 
     const [fetchResponse, SQL] = await Promise.all([
-        fetch('endpoints.sqlite--but.cloudfront.does.not.want.to.compress.binary.data.so.lets.just.call.it.xml'),
-        initSqlJs({ locateFile: file => `sql.js/${file}` }),
+        fetch('assets/endpoints.sqlite--but.cloudfront.does.not.want.to.compress.binary.data.so.lets.just.call.it.xml'),
+        initSqlJs({ locateFile: file => `assets/sql.js/${file}` }),
     ]);
 
     if (!fetchResponse.ok) {

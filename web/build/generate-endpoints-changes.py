@@ -4,7 +4,11 @@ import os
 import re
 import html
 
-html_out = '''
+html_out = open("web/build/html-start", "r").read()
+
+html_out += f'''
+    <!-- file: {os.path.basename(__file__)} -->
+
     <h1>Recent changes in public API endpoints</h1>
 
     <div class="text-xs text-gray-500 font-light max-w-prose">
@@ -32,16 +36,17 @@ with open("output/changes") as f:
             if date_count > 30:
                 break
 
-            html_out += f'<div id="changes-date-{line}" class="text-sm mt-3">{line}</div>'
-            html_out += f'<ul id="changes-data-{line}" class="text-xs ml-3">'
+            html_out += f'<div id="changes-date-{line}" class="text-sm mt-3">{line}</div>\n'
+            html_out += f'<ul id="changes-data-{line}" class="text-xs ml-3">\n'
             data_tags_open = True
 
         else:
             line = re.sub(r'^(.)', r'\1 ', line) # add space
-            html_out += f'<li><code>{html.escape(line)}</code></li>'
+            html_out += f'<li><code>{html.escape(line)}</code></li>\n'
 
-html_out += '</ul>'
-html_out += '</div>'
+html_out += '</ul>\n'
+html_out += '</div>\n'
 
+html_out += open("web/build/html-end", "r").read()
 
-open("output/endpoints-changes-main.html", 'w').write(html_out)
+open("output/endpoints-changes.html", 'w').write(html_out)

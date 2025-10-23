@@ -347,52 +347,51 @@ def get_main(event, region_list_from_user):
                         the small hx-trigger delay for 'regions' is to avoid request flooding
                         due to the 'Select/Clear all' buttons (throttling doesn't seem to work reliably)
                     -->
+                    <div class="pb-3">
+                        <label for="filter-service"><strong>Filter services:</strong></label>
+                        <input
+                            type="text"
+                            name="filter-service"
+                            id="filter-service"
+                            autofocus
+                            pattern="[a-z0-9]*"
+                            class="w-full px-1 border-1 bg-white rounded border-1"
+                            onkeydown="if (event.key === 'Escape') event.target.value = ''"
+                            onkeyup="if (event.key.length == 1) removeEndpointClassFilter()"
+                            onkeypress="filterData()"
+                        >
+                    </div>
+
+                    <div class="pb-3">
+                        <label><strong>Select endpoints:</strong></label>
+
+                        <div class="text-sm">
+                            <div>
+                                <input type="radio" name="filter-class" id="class-ipv6only" value="ipv6" checked="default">
+                                <label for="class-ipv6only">IPv6 (by default) only</label>
+                            </div>
+
+                            <div>
+                                <input type="radio" name="filter-class" id="class-ipv6dualstack" value="ipv6-dualstack">
+                                <label for="class-ipv6dualstack">IPv6 (default or dualstack)</label>
+                            </div>
+
+                            <div>
+                                <input type="radio" name="filter-class" id="class-all" value="all">
+                                <label for="class-all">All endpoints</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <form
-                        id="settings-form"
+                        id="regions-form"
                         hx-get="awsipv6-endpoints"
                         hx-target="#table-data"
                         hx-trigger="
                             change delay:10ms from:input[name='regions'],
-                            change from:input[name='filter-class'],
-                            keyup delay:500ms from:input[name='filter-service']
                         "
                         hx-sync="this:replace"
                     >
-                        <div class="pb-3">
-                            <label for="filter-service"><strong>Filter services:</strong></label>
-                            <input
-                                type="text"
-                                name="filter-service"
-                                id="filter-service"
-                                autofocus
-                                pattern="[a-z0-9]*"
-                                class="w-full px-1 border-1 bg-white rounded border-1"
-                                onkeydown="if (event.key === 'Escape') event.target.value = ''"
-                                onkeyup="if (event.key.length == 1) removeEndpointClassFilter()"
-                            >
-                        </div>
-
-                        <div class="pb-3">
-                            <label><strong>Select endpoints:</strong></label>
-
-                            <div class="text-sm">
-                                <div>
-                                    <input type="radio" name="filter-class" id="class-ipv6only" value="ipv6" checked="default">
-                                    <label for="class-ipv6only">IPv6 (by default) only</label>
-                                </div>
-
-                                <div>
-                                    <input type="radio" name="filter-class" id="class-ipv6dualstack" value="ipv6-dualstack">
-                                    <label for="class-ipv6dualstack">IPv6 (default or dualstack)</label>
-                                </div>
-
-                                <div>
-                                    <input type="radio" name="filter-class" id="class-all" value="all">
-                                    <label for="class-all">All endpoints</label>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="pb-3">
                             <label><strong>Select regions:</strong></label>
                             <div class="pb-2">

@@ -69,8 +69,8 @@ print('''<!doctype html>
 print(f'<meta property="og:image" content="{base_url}/og-image.png">')
 print('''
 <meta property="og:type" content="website">
-<link rel="stylesheet" href="uglyshit.css">
-<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="assets/uglyshit.css">
+<link rel="stylesheet" href="assets/fonts.css">
 <title>AWS service endpoints by region and IPv6 support</title>
 <script src="uglyshit.js"></script>
 </head>

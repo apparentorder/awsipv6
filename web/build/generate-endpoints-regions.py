@@ -24,9 +24,9 @@ cur = epdb.execute("""
 
 count_all = epdb.execute("SELECT COUNT(DISTINCT service_name) FROM ENDPOINT").fetchone()[0];
 
-    # ORDER BY (sum(endpoint_default_has_ipv6) * 100.0 / sum(case when endpoint_default_has_ipv4 then 1 else 0 end)) DESC,
-    #          (sum(case when endpoint_dualstack_has_ipv6 and not endpoint_default_has_ipv6 then 1 else 0 end) * 100.0 / sum(case when endpoint_default_has_ipv4 then 1 else 0 end)) DESC
-html = f'''
+html = open("web/build/html-start", "r").read()
+
+html += f'''
     <!-- file: {os.path.basename(__file__)} -->
     <table class="progress-table font-light">
         <thead>
@@ -67,4 +67,6 @@ for row in cur.fetchall():
 
 html += '</table>\n'
 
-open("output/endpoints-regions-main.html", 'w').write(html)
+html += open("web/build/html-start", "r").read()
+
+open("output/endpoints-regions.html", 'w').write(html)

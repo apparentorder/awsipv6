@@ -2,7 +2,9 @@
 
 import os
 
-html = f'''
+html = open("web/build/html-start", "r").read()
+
+html += f'''
     <!-- file: {os.path.basename(__file__)} -->
 
     <div id="everything" class="border-t">
@@ -60,8 +62,10 @@ html = f'''
         </div> <!-- main-content -->
     </div> <!-- everything -->
 
-    <script defer src="sql.js/sql-wasm.js"></script>
-    <script defer src="endpoints-matrix.js"></script>
+    <script defer src="assets/sql.js/sql-wasm.js"></script>
+    <script defer src="assets/endpoints-matrix.js"></script>
 '''
 
-open("output/endpoints-matrix-main.html", 'w').write(html)
+html += open("web/build/html-end", "r").read()
+
+open("output/endpoints-matrix.html", 'w').write(html)

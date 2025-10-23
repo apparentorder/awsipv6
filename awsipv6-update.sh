@@ -29,6 +29,7 @@ if test "$SKIP_GET" = 1; then
 else
     rm -rf output
     mkdir output
+    mkdir output/assets
 
     if ! test -d "$BOTOCORE_REPO"; then
         git clone -b master https://github.com/boto/botocore.git "$BOTOCORE_REPO"
@@ -74,28 +75,23 @@ if test "$SKIP_GET" -ne 1; then
     python3 -u update-data/awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
 fi
 
-sh web/build/generate-html.sh
+for f in web/build/generate*py; do
+    python3 $f
+done
 
-npx tailwindcss -i web/static/uglyshit.tailwind -o output/uglyshit.css
+npx tailwindcss -i web/uglyshit.tailwind -o output/assets/uglyshit.css
 
 # provide .gz versions for smaller downloads
 gzip --best --keep --force output/endpoints.sqlite
 gzip --best --keep --force output/endpoints.json
 
-cp output/endpoints.sqlite output/endpoints.sqlite--but.cloudfront.does.not.want.to.compress.binary.data.so.lets.just.call.it.xml
+cp output/endpoints.sqlite output/assets/endpoints.sqlite--but.cloudfront.does.not.want.to.compress.binary.data.so.lets.just.call.it.xml
 
-cp node_modules/htmx.org/dist/htmx.min.js output/htmx.min.js
-rsync -a --delete node_modules/sql.js/dist/ output/sql.js/
+cp node_modules/htmx.org/dist/htmx.min.js output/assets/htmx.min.js
+rsync -a --delete node_modules/sql.js/dist/ output/assets/sql.js/
 
 aws s3 sync output/ "$S3BASE"/
 aws s3 sync web/static/ "$S3BASE"/
-
-pip install \
-    --platform manylinux2014_aarch64 \
-    --python-version 3.13 \
-    --target .pydep/python \
-    --only-binary=:all: \
-    psycopg psycopg-binary
 
 npx cdk diff   $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
 npx cdk deploy $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
