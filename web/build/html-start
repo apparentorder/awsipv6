@@ -35,7 +35,7 @@
 				</ul></div>
 				<div><span class="font-semibold px-2 md:px-4">Service API endpoints:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
-					<li><a href="endpoints-overview.html">Overview</a></li>
+					<li><a href="endpoints-summary.html">Summary</a></li>
 					<li><a href="endpoints-services.html">By Service</a></li>
 					<li><a href="endpoints-regions.html">By Region</a></li>
 					<li><a href="endpoints-changes.html">Changes</a></li>

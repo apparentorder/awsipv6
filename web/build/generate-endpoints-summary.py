@@ -111,4 +111,4 @@ html += f'''
 
 html += open("web/build/html-end", "r").read()
 
-open("output/endpoints-overview.html", 'w').write(html)
+open("output/endpoints-summary.html", 'w').write(html)

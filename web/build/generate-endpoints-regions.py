@@ -67,6 +67,6 @@ for row in cur.fetchall():
 
 html += '</table>\n'
 
-html += open("web/build/html-start", "r").read()
+html += open("web/build/html-end", "r").read()
 
 open("output/endpoints-regions.html", 'w').write(html)

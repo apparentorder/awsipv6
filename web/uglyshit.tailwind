@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
-@source "./backend/*.py";
 @source "./web/build/*.py";
+@source "./web/build/*.html";
 
 @theme {
   --font-*: initial;
