@@ -47,6 +47,18 @@ class Awsipv6CdnStack(cdk.Stack):
             ),
         )
 
+        cf_index_function = cloudfront.Function(self, f"Awsipv6IndexFunction",
+            runtime = cloudfront.FunctionRuntime.JS_2_0,
+            code = cloudfront.FunctionCode.from_inline("""
+                function handler(event) {
+                    if (event.request.uri.endsWith('/') && event.request.uri !== '/') {
+                        event.request.uri += 'index.html';
+                    }
+                    return event.request;
+                }
+            """),
+        )
+
         cf_distribution = cloudfront.Distribution(self, f"Awsipv6Distribution",
             comment = "Awsipv6",
             domain_names = ["awsipv6.neveragain.de"],
@@ -60,7 +72,7 @@ class Awsipv6CdnStack(cdk.Stack):
                 viewer_protocol_policy = cloudfront.ViewerProtocolPolicy.ALLOW_ALL,
                 # It seems necessary to pass the headers to the origin so that Cloudfront actually does compression.
                 origin_request_policy = cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
-                cache_policy = cf_cache_policy
+                cache_policy = cf_cache_policy,
             ),
             additional_behaviors = {
                 "/awsipv6-*": cloudfront.BehaviorOptions(
@@ -90,6 +102,10 @@ class Awsipv6CdnStack(cdk.Stack):
                     viewer_protocol_policy = cloudfront.ViewerProtocolPolicy.ALLOW_ALL,
                     origin_request_policy = cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
                     cache_policy = cloudfront.CachePolicy.CACHING_DISABLED,
+                    function_associations = [cloudfront.FunctionAssociation(
+                        function = cf_index_function,
+                        event_type = cloudfront.FunctionEventType.VIEWER_REQUEST,
+                    )],
                 ),
             },
         )

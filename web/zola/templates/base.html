@@ -48,7 +48,8 @@
 </div>
 
 <main class="p-1 md:p-4">
-{{ page.content | safe }}
+{% block content %}
+{% endblock content %}
 </main>
 
 <footer class="mt-auto border-t border-gray-300 p-1 text-xs bg-gray-100">
