@@ -4,9 +4,7 @@ import os
 import re
 import html
 
-html_out = open("web/build/html-start", "r").read()
-
-html_out += f'''
+html_out = f'''
     <!-- file: {os.path.basename(__file__)} -->
 
     <h1>Recent changes in public API endpoints</h1>
@@ -47,6 +45,4 @@ with open("output/changes") as f:
 html_out += '</ul>\n'
 html_out += '</div>\n'
 
-html_out += open("web/build/html-end", "r").read()
-
-open("output/endpoints-changes.html", 'w').write(html_out)
+open("web/zola/templates/partials/endpoints-changes.html", 'w').write(html_out)

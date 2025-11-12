@@ -1,9 +1,5 @@
-# Yes, this file could have been a static HTML file.
 
-import os
-
-html = f'''
-    <!-- file: {os.path.basename(__file__)} -->
+    <!-- file: generate-endpoints-matrix.py -->
 
     <div id="everything" class="border-t">
         <div id="filters-container" class="p-2 bg-gray-100 border-b-2">
@@ -62,6 +58,3 @@ html = f'''
 
     <script defer src="assets/sql.js/sql-wasm.js"></script>
     <script defer src="assets/endpoints-matrix.js"></script>
-'''
-
-open("web/zola/templates/partials/endpoints-matrix.html", 'w').write(html)

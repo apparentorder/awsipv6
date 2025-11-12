@@ -58,9 +58,7 @@ pie_conic_gradient_str = ", ".join(parts)
 
 # -----
 
-html = open("web/build/html-start", "r").read()
-
-html += f'''
+html = f'''
     <!-- file: {os.path.basename(__file__)} -->
     <div class="flex flex-col md:flex-row gap-4" hx-boost="true" hx-push-url="true">
         <div class="max-w-prose">
@@ -109,6 +107,4 @@ html += f'''
     </div>
 '''
 
-html += open("web/build/html-end", "r").read()
-
-open("output/endpoints-summary.html", 'w').write(html)
+open("web/zola/templates/partials/endpoints-summary.html", 'w').write(html)

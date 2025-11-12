@@ -24,9 +24,7 @@ cur = epdb.execute("""
 
 count_all = epdb.execute("SELECT COUNT(DISTINCT service_name) FROM ENDPOINT").fetchone()[0];
 
-html = open("web/build/html-start", "r").read()
-
-html += f'''
+html = f'''
     <!-- file: {os.path.basename(__file__)} -->
     <table class="progress-table font-light">
         <thead>
@@ -67,6 +65,4 @@ for row in cur.fetchall():
 
 html += '</table>\n'
 
-html += open("web/build/html-end", "r").read()
-
-open("output/endpoints-regions.html", 'w').write(html)
+open("web/zola/templates/partials/endpoints-regions.html", 'w').write(html)

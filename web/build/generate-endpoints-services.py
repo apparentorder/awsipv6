@@ -22,9 +22,7 @@ cur = epdb.execute("""
         service_name
 """)
 
-html = open("web/build/html-start", "r").read()
-
-html += f'''
+html = f'''
     <!-- file: {os.path.basename(__file__)} -->
 
     <table class="progress-table font-light">
@@ -94,11 +92,9 @@ for row in cur.fetchall():
     html_tooltip += f'</div>' # service details / regions
     html_tooltip += f'</div>' # stauts-bar-content
 
-    open(f"output/endpoints-services-tooltip-{row['service_name']}.html", 'w').write(html_tooltip)
+    open(f"web/zola/static/endpoints-services-tooltip-{row['service_name']}.html", 'w').write(html_tooltip)
 
 html += '</tbody>\n'
 html += '</table>\n'
 
-html += open("web/build/html-end", "r").read()
-
-open("output/endpoints-services.html", 'w').write(html)
+open("web/zola/templates/partials/endpoints-services.html", 'w').write(html)

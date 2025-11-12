@@ -1,0 +1,42 @@
+<h1>Frequently Asked Questions</h1>
+
+<div class="max-w-prose font-semibold">
+    This page is work in progress. Maybe in a few weeks?
+</div>
+
+<div class="max-w-prose mt-4">
+    <p>
+        This page will host FAQs regarding IPv6 support on AWS in general. It will also cover
+        a few items for this site, mainly regarding the service endpoint data collection.
+    </p>
+</div>
+
+<div class="max-w-prose">
+    <p>In the meantime, some quick facts about the service API endpoint data:</p>
+
+    First of all, the raw data is available in several formats:
+    <ul class="list-disc pl-6 text-sm">
+        <li><a download="endpoints.json.gz"   href="endpoints.json.gz">JSON (gzip)</a></li>
+        <li><a download="endpoints.sqlite.gz" href="endpoints.sqlite.gz">SQLite database (gzip)</a></li>
+        <li><a download="endpoints.text"      href="endpoints.text">Plain text</a></li>
+    </ul>
+</div>
+
+<div class="max-w-prose mt-4">
+    Some other fun facts:
+    <ul class="list-disc pl-6 text-xs max-w-prose">
+        <li>Data is generated almost daily (Tue - Sat) from botocore's <code>get_available_services()</code> and <code>create_client()</code></li>
+        <li>This site has been fully rebuilt in 2025-10; the <a href="endpoints.html">original endpoints page</a> (a massive blob of HTML) is still available and being updated for a while longer</li>
+        <li>IPv4 and IPv6 support is determined by DNS only (i.e. if an endpoint returns any AAAA records, it is considered IPv6-enabled)</li>
+        <li>AWS partitions that are marked as <code>_UNSUPPORTED_DUALSTACK_PARTITIONS</code> have been excluded; same for partitions that seemingly should have been flagged non-dualstack but weren't (<code>aws-iso-e</code>, <code>aws-iso-f</code>)</li>
+        <li>Service APIs that require additional parameters have been excluded (currently only <code>cloudfront-keyvaluestore</code> and <code>s3control</code>)</li>
+        <li>Regions that are not available for a service are not checked, according to botocore's <code>get_available_services()</code> (which seems to be wrong sometimes)</li>
+        <li>Non-regionalized services (that have only one partition-wide endpoint, i.e. IAM or Route53) are not properly supported yet</li>
+        <li>Fun fact: In about 2/3 of regions, there isn't just <code>s3.$region.amazonaws.com</code>, but also a version with dash, <code>s3-$region.amazonaws.com</code>,
+        and that also works. Reasons unknown.</li>
+        <li>The China regions' DNS resolution has been unreliable for years, at least from both AWS eu-central-1 and GitHub runners, so their
+        entries might occasionally "flicker" in the data; this affects about a handful of endpoints per week or so. All entries
+        with <code>amazonwebservices.com.cn</code> or <code>amazonaws.com.cn</code> names are therefore excluded when generating the
+        list of recent changes.</li>
+    </ul>
+</div>

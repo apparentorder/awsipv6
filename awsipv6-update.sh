@@ -4,6 +4,7 @@ set -e
 
 BOTOCORE_REPO=~/environment/botocore
 S3BASE="s3://awsipv6/beta"
+URLBASE="https://awsipv6.neveragain.de/beta/"
 CDK_DSQL_STACK_NAME="Awsipv6BetaStack"
 CDK_STACK_TO_DEPLOY="Awsipv6BetaStack"
 LIVE_ARG=""
@@ -15,6 +16,7 @@ if test "$1" = "--live"; then
     LIVE_ARG="--live"
     CDK_DSQL_STACK_NAME="Awsipv6Stack"
     CDK_STACK_TO_DEPLOY="--all"
+    URLBASE="https://awsipv6.neveragain.de/"
     shift
 fi
 
@@ -81,6 +83,9 @@ done
 
 npx tailwindcss -i web/uglyshit.tailwind -o output/assets/uglyshit.css
 
+zola --root web/zola build --output-dir tmp-zola-build --base-url "$URLBASE" --force
+rsync -a tmp-zola-build/ output/
+
 # provide .gz versions for smaller downloads
 gzip --best --keep --force output/endpoints.sqlite
 gzip --best --keep --force output/endpoints.json
@@ -90,8 +95,8 @@ cp output/endpoints.sqlite output/assets/endpoints.sqlite--but.cloudfront.does.n
 cp node_modules/htmx.org/dist/htmx.min.js output/assets/htmx.min.js
 rsync -a --delete node_modules/sql.js/dist/ output/assets/sql.js/
 
-aws s3 sync output/ "$S3BASE"/
-aws s3 sync web/static/ "$S3BASE"/
+aws s3 sync --delete output/ "$S3BASE"/
+#aws s3 sync web/static/ "$S3BASE"/
 
 npx cdk diff   $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
 npx cdk deploy $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
