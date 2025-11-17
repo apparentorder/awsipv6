@@ -22,7 +22,7 @@ Some other fun facts:
 
 - Data is generated almost daily (Tue - Sat) from botocore's `get_available_services()` and
   `create_client()`
-- This site has been fully rebuilt in 2025-10; the [original endpoints page](endpoints.html)
+- This site has been fully rebuilt in 2025-10; the [original endpoints page]({{config.base_url}}/endpoints.html)
   (a massive blob of HTML) is still available and being updated for a while longer
 - IPv4 and IPv6 support is determined by DNS only (i.e. if an endpoint returns any AAAA
   records, it is considered IPv6-enabled)
