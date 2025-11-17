@@ -1,5 +1,4 @@
 +++
 title = "Summary"
+template = "generated.html"
 +++
-
-{% include "partials/endpoints-summary.html" %}

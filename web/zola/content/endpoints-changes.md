@@ -1,5 +1,4 @@
 +++
 title = "Changes"
+template = "generated.html"
 +++
-
-{% include "partials/endpoints-changes.html" %}

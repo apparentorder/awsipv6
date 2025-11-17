@@ -51,9 +51,9 @@ class Awsipv6CdnStack(cdk.Stack):
             runtime = cloudfront.FunctionRuntime.JS_2_0,
             code = cloudfront.FunctionCode.from_inline("""
                 function handler(event) {
-                    if (event.request.uri.endsWith('/') && event.request.uri !== '/') {
+                    if (event.request.uri.endsWith('/') && event.request.uri !== '/')
                         event.request.uri += 'index.html';
-                    }
+
                     return event.request;
                 }
             """),

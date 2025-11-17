@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<title>{{ page.title | default(value=config.title) }}</title>
+	<title>{{ page.title | default(value=config.title) }} | awsipv6</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="UTF-8">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta property="og:title" content="{{ page.title | default(value=config.title) }}">
 	<meta name="description" content="{{ page.description | default(value=config.description) }}">
 	<meta property="og:description" content="{{ page.description | default(value=config.description) }}">
-	<meta property="og:image" content="{{ config.base_url }}/og-image.png">
+	<meta property="og:image" content="{{ config.base_url | safe }}/og-image.png">
 	<meta property="og:type" content="website">
 	<link rel="canonical" href="{{ current_url | safe }}">
-	<link rel="stylesheet" href="assets/uglyshit.css">
-	<link rel="stylesheet" href="assets/fonts.css">
-	<script defer src="assets/htmx.min.js"></script>
+	<link rel="stylesheet" href="{{ config.base_url | safe }}/assets/uglyshit.css">
+	<link rel="stylesheet" href="{{ config.base_url | safe }}/assets/fonts.css">
+	<script defer src="{{ config.base_url | safe }}/assets/htmx.min.js"></script>
 </head>
 
 <body class="flex flex-col min-h-screen">
@@ -27,20 +27,20 @@
 			<div class="grid grid-cols-1 md:grid-cols-[auto_1fr] py-1">
 				<div><span class="font-semibold px-2 md:px-4">AWS IPv6 Basics:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
-					<li><a href="intro.html">Introduction</a></li>
-					<li><a href="ingress.html">Ingress</a></li>
-					<li><a href="egress.html">Egress</a></li>
-					<li><a href="sdk-programming.html">Programming/SDK</a></li>
-					<li><a href="faq.html">FAQ</a></li>
-					<li><a href="resources.html">Resources</a></li>
+					<li><a href="{{ get_url(path="@/intro.md") }}">Introduction</a></li>
+					<li><a href="{{ get_url(path="@/ingress.md") }}">Ingress</a></li>
+					<li><a href="{{ get_url(path="@/egress.md") }}">Egress</a></li>
+					<li><a href="{{ get_url(path="@/sdk-programming.md") }}">Programming/SDK</a></li>
+					<li><a href="{{ get_url(path="@/faq.md") }}">FAQ</a></li>
+					<li><a href="{{ get_url(path="@/resources.md") }}">Resources</a></li>
 				</ul></div>
 				<div><span class="font-semibold px-2 md:px-4">Service API endpoints:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
-					<li><a href="endpoints-summary.html">Summary</a></li>
-					<li><a href="endpoints-services.html">By Service</a></li>
-					<li><a href="endpoints-regions.html">By Region</a></li>
-					<li><a href="endpoints-changes.html">Changes</a></li>
-					<li><a href="endpoints-matrix.html">Matrix</a></li>
+					<li><a href="{{ get_url(path="@/endpoints-summary.md") }}">Summary</a></li>
+					<li><a href="{{ get_url(path="@/endpoints-services.md") }}">By Service</a></li>
+					<li><a href="{{ get_url(path="@/endpoints-regions.md") }}">By Region</a></li>
+					<li><a href="{{ get_url(path="@/endpoints-changes.md") }}">Changes</a></li>
+					<li><a href="{{ get_url(path="@/endpoints-matrix.md") }}">Matrix</a></li>
 				</ul></div>
 			</div>
 		</div>

@@ -92,9 +92,9 @@ for row in cur.fetchall():
     html_tooltip += f'</div>' # service details / regions
     html_tooltip += f'</div>' # stauts-bar-content
 
-    open(f"output/endpoints-services-tooltip-{row['service_name']}.html", 'w').write(html_tooltip)
+    open(f"output/endpoints-services/endpoints-services-tooltip-{row['service_name']}.html", 'w').write(html_tooltip)
 
 html += '</tbody>\n'
 html += '</table>\n'
 
-open("web/zola/templates/partials/endpoints-services.html", 'w').write(html)
+open("web/zola/generated/endpoints-services.html", 'w').write(html)

@@ -1,5 +1,4 @@
 +++
 title = "Matrix"
+template = "generated.html"
 +++
-
-{% include "partials/endpoints-matrix.html" %}

@@ -64,4 +64,4 @@ html = f'''
     <script defer src="assets/endpoints-matrix.js"></script>
 '''
 
-open("web/zola/templates/partials/endpoints-matrix.html", 'w').write(html)
+open("web/zola/generated/endpoints-matrix.html", 'w').write(html)

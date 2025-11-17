@@ -65,4 +65,4 @@ for row in cur.fetchall():
 
 html += '</table>\n'
 
-open("web/zola/templates/partials/endpoints-regions.html", 'w').write(html)
+open("web/zola/generated/endpoints-regions.html", 'w').write(html)

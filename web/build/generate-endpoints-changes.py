@@ -45,4 +45,4 @@ with open("output/changes") as f:
 html_out += '</ul>\n'
 html_out += '</div>\n'
 
-open("web/zola/templates/partials/endpoints-changes.html", 'w').write(html_out)
+open("web/zola/generated/endpoints-changes.html", 'w').write(html_out)

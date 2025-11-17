@@ -1,5 +1,4 @@
 +++
 title = "By Region"
+template = "generated.html"
 +++
-
-{% include "partials/endpoints-regions.html" %}

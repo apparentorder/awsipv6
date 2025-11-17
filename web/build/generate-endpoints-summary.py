@@ -107,4 +107,4 @@ html = f'''
     </div>
 '''
 
-open("web/zola/templates/partials/endpoints-summary.html", 'w').write(html)
+open("web/zola/generated/endpoints-summary.html", 'w').write(html)

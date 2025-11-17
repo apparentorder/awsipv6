@@ -4,7 +4,7 @@ set -e
 
 BOTOCORE_REPO=~/environment/botocore
 S3BASE="s3://awsipv6/beta"
-URLBASE="https://awsipv6.neveragain.de/beta/"
+URLBASE="https://awsipv6.neveragain.de/beta"
 CDK_DSQL_STACK_NAME="Awsipv6BetaStack"
 CDK_STACK_TO_DEPLOY="Awsipv6BetaStack"
 LIVE_ARG=""
@@ -16,7 +16,7 @@ if test "$1" = "--live"; then
     LIVE_ARG="--live"
     CDK_DSQL_STACK_NAME="Awsipv6Stack"
     CDK_STACK_TO_DEPLOY="--all"
-    URLBASE="https://awsipv6.neveragain.de/"
+    URLBASE="https://awsipv6.neveragain.de"
     shift
 fi
 
@@ -32,6 +32,8 @@ else
     rm -rf output
     mkdir output
     mkdir output/assets
+    mkdir output/endpoints-matrix
+    mkdir output/endpoints-matrix/assets
 
     if ! test -d "$BOTOCORE_REPO"; then
         git clone -b master https://github.com/boto/botocore.git "$BOTOCORE_REPO"
@@ -77,6 +79,14 @@ if test "$SKIP_GET" -ne 1; then
     python3 -u update-data/awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
 fi
 
+if ! test -d web/zola/generated; then
+    mkdir web/zola/generated
+fi
+
+if ! test -d output/endpoints-services; then
+    mkdir output/endpoints-services
+fi
+
 for f in web/build/generate*py; do
     python3 $f
 done
@@ -90,10 +100,11 @@ rsync -a tmp-zola-build/ output/
 gzip --best --keep --force output/endpoints.sqlite
 gzip --best --keep --force output/endpoints.json
 
-cp output/endpoints.sqlite output/assets/endpoints.sqlite--but.cloudfront.does.not.want.to.compress.binary.data.so.lets.just.call.it.xml
-
 cp node_modules/htmx.org/dist/htmx.min.js output/assets/htmx.min.js
-rsync -a --delete node_modules/sql.js/dist/ output/assets/sql.js/
+
+cp web/zola/static/assets/endpoints-matrix.js output/endpoints-matrix/assets/
+cp output/endpoints.sqlite output/endpoints-matrix/assets/endpoints.sqlite--but.cloudfront.does.not.want.to.compress.binary.data.so.lets.just.call.it.xml
+rsync -a --delete node_modules/sql.js/dist/ output/endpoints-matrix/assets/sql.js/
 
 aws s3 sync --delete output/ "$S3BASE"/
 #aws s3 sync web/static/ "$S3BASE"/

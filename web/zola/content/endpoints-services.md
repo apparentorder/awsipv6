@@ -1,5 +1,4 @@
 +++
 title = "By Service"
+template = "generated.html"
 +++
-
-{% include "partials/endpoints-services.html" %}
