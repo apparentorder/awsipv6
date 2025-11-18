@@ -14,15 +14,15 @@ In the meantime, some quick facts about the service API endpoint data:
 
 First of all, the raw data is available in several formats:
 
-- [JSON (gzip)](/endpoints.json.gz)
-- [SQLite database (gzip)](/endpoints.sqlite.gz)
-- [Plain text](/endpoints.text)
+- {{baselink(filename="endpoints.json.gz", description="JSON (gzip)", download=true)}}
+- {{baselink(filename="endpoints.sqlite.gz", description="SQLite (gzip)", download=true)}}
+- {{baselink(filename="endpoints.text", description="Plain text")}}
 
 Some other fun facts:
 
 - Data is generated almost daily (Tue - Sat) from botocore's `get_available_services()` and
   `create_client()`
-- This site has been fully rebuilt in 2025-10; the [original endpoints page]({{config.base_url}}/endpoints.html)
+- This site has been fully rebuilt in 2025-10; the {{baselink(filename="endpoints.html", description="original endpoints page")}}
   (a massive blob of HTML) is still available and being updated for a while longer
 - IPv4 and IPv6 support is determined by DNS only (i.e. if an endpoint returns any AAAA
   records, it is considered IPv6-enabled)
