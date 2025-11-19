@@ -4,7 +4,11 @@ date = 2025-11-19
 updated = 2025-11-19
 +++
 
-**This page is work in progress. Maybe in a few weeks?**
+# Ingress
+
+AWS services support status for IPv6 ingress.
+
+## This page is work in progress. Maybe in a few weeks?
 
 This page will explore configuration options for IPv6 ingress -- that is, for receiving
 traffic from IPv6-enabled clients. Many services support IPv6 ingress, but some still don't.

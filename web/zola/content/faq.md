@@ -6,13 +6,13 @@ updated = 2025-11-19
 
 # Frequently Asked Questions
 
-**This page is work in progress. Maybe in a few weeks?**
+## This page is work in progress. Maybe in a few weeks?
 
 This page will host FAQs regarding IPv6 support on AWS in general.
 It will also cover a few items for this site, mainly regarding the service endpoint data
 collection.
 
-In the meantime, some quick facts about the service API endpoint data:
+## Service API Endpoints: Raw Data
 
 First of all, the raw data is available in several formats:
 
@@ -20,7 +20,7 @@ First of all, the raw data is available in several formats:
 - {{baselink(filename="endpoints.sqlite.gz", description="SQLite (gzip)", download=true)}}
 - {{baselink(filename="endpoints.text", description="Plain text")}}
 
-Some other fun facts:
+## Service API Endpoints: Notes
 
 - Data is generated almost daily (Tue - Sat) from botocore's `get_available_services()` and
   `create_client()`
@@ -35,10 +35,12 @@ Some other fun facts:
   `cloudfront-keyvaluestore` and `s3control`)
 - Regions that are not available for a service are not checked, according to botocore's
   `get_available_services()` (which seems to be wrong sometimes)
-- Non-regionalized services (that have only one partition-wide endpoint, i.e. IAM or
+- Non-regionalized services (that have only one partition-wide endpoint, e.g. IAM or
   Route53) are not properly supported yet
 - Fun fact: In about 2/3 of regions, there isn't just `s3.$region.amazonaws.com`, but also a
-  version with dash, `s3-$region.amazonaws.com`, and that also works. Reasons unknown.
+  version with dash, `s3-$region.amazonaws.com`, and that also works. Reasons unknown, but
+  the [documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/VirtualHosting.html)
+  calls them "legacy endpoints"
 - The China regions' DNS resolution has been unreliable for years, at least from both AWS
   eu-central-1 and GitHub runners, so their entries might occasionally "flicker" in the
   data; this affects about a handful of endpoints per week or so. All entries with

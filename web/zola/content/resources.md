@@ -4,7 +4,9 @@ date = 2025-11-19
 updated = 2025-11-19
 +++
 
-**This page is work in progress. Maybe in a few weeks?**
+# Resources
+
+## This page is work in progress. Maybe in a few weeks?
 
 This page will collect links, whitepapers and other useful resources for
 implementing IPv6 on AWS.

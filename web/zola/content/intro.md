@@ -4,30 +4,52 @@ date = 2025-11-19
 updated = 2025-11-19
 +++
 
-# AWS Services IPv6 Support Information
+# AWS IPv6 Information Hub
 
 Welcome, adventurer!
 
-**This page is work in progress. Maybe in a few weeks?**
+## This page is work in progress. Maybe in a few weeks? ##
 
-This site is an information hub for all things IPv6 on Amazon Web Services (AWS).
+## Introduction
 
-It assumes familiarity with IPv6 basics and focuses on AWS-specific details. For an introduction to
-IPv6 networking, please see FIXME.
+The world is finally moving on from IPv4. AWS has started
+[charging for public IPv4 addresses](https://aws.amazon.com/blogs/aws/new-aws-public-ipv4-address-charge-public-ip-insights/)
+years ago, arguing it would be "accelerating your adoption of IPv6". Each public IPv4 address now has a significant price tag.
 
-You will find information on [ingress](@/ingress.md) traffic — that is, for incoming requests
-from clients. Around 50% of clients globally have IPv6 connectivity, with more than 75% in some advanced countries.
-In many countries, IPv6 actually reduces latency for the end user by 10 milliseconds or more!
-For detailed data, see
-[Google's IPv6 statistics](https://www.google.com/intl/en/ipv6/statistics.html#tab=per-country-ipv6-adoption).
+Around 50% of all clients globally now have IPv6 connectivity. In many countries,
+IPv6 actually reduces latency for end users! ([Google IPv6 statistics](https://www.google.com/intl/en/ipv6/statistics.html#tab=per-country-ipv6-adoption))
 
-There is also information on [egress](@/egress.md) traffic — implementing IPv6 connectivity
-for resources in AWS VPCs, so they can connect to the outside world using IPv6, including other AWS services.
-One key advantage is that IPv6 egress does not require NAT, so there is no Managed NAT Gateway tax on this traffic.
+IPv4 usually requires NAT, and AWS Managed NAT Gateway's per-gigabyte traffic charges can be very expensive.
 
-Closely related to egress is some information on [programming the AWS SDKs](@/sdk-programming.md).
-Contrary to what you'd expect, making custom AWS programs like Lambda functions use IPv6 to call other
-AWS services doesn't "just work" in most cases, but requires careful consideration and configuration opt-in,
-which is pretty unique behavior in this world.
+IPv6 can bring serious savings, better performance, has no more NAT, no more subnet sizing guesswork,
+no more address collisions.
 
-... separate 'p' on IPv4 address tax ...
+This site provides up-to-date technical information to get you started with
+IPv6 on AWS.
+
+## Overview
+
+### IPv6 Connectivity
+
+You will find information on [ingress](@/ingress.md) traffic -- that is, allowing IPv6 clients to
+connect to your services.
+
+There is information on [egress](@/egress.md) traffic -- allowing your AWS resources to
+connect to AWS and third-party services like Docker Hub using IPv6 (reducing NAT Gateway traffic!).
+
+### AWS SDKs
+
+An introduction to [using the AWS SDKs](@/sdk-programming.md) with IPv6, which isn't as straight-forward
+as you'd expect.
+
+### Service API Endpoints
+
+Years ago, this site started as single page providing detailed data on IPv6 support for public AWS service API endpoints.
+A modernized version of the original full endpoints matrix is available [here](@/endpoints-matrix.md), in addition
+to a new [summary](@/endpoints-services.md) for those endpoints.
+
+## Audience
+
+The information on this site assumes familiarity with IPv6 in general. If you are not familiar with IPv6, check out
+[book6](https://github.com/becarpenter/book6/blob/main/Contents.md),
+*"a practical introduction to IPv6 for technical people".*
