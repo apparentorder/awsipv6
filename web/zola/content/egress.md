@@ -1,5 +1,7 @@
 +++
 title = "Egress"
+date = 2025-11-19
+updated = 2025-11-19
 +++
 
 # AWS Services Support Status for IPv6 Egress

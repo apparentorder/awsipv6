@@ -159,3 +159,39 @@ code {
     position: absolute;
     @apply border border-gray-300 bg-gray-100 rounded shadow-lg p-1 mt-8 w-auto max-w-[1000px];
 }
+
+h1 {
+  @apply text-2xl font-bold mb-4 text-gray-800;
+}
+
+h2 {
+  @apply text-xl font-semibold mb-3 text-gray-700;
+}
+
+h3 {
+  @apply text-lg font-medium mb-2 text-gray-600;
+}
+
+h4 {
+  @apply text-base font-medium mb-2 text-gray-600;
+}
+
+h5 {
+  @apply text-sm font-medium mb-1 text-gray-600;
+}
+
+h6 {
+  @apply text-xs font-medium mb-1 text-gray-600;
+}
+
+main ul {
+  @apply list-disc list-inside pl-2;
+}
+
+main ol {
+  @apply list-decimal list-inside pl-2;
+}
+
+main li {
+  @apply mb-1;
+}

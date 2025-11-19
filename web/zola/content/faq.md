@@ -1,5 +1,7 @@
 +++
 title = "FAQ"
+date = 2025-11-19
+updated = 2025-11-19
 +++
 
 # Frequently Asked Questions

@@ -1,10 +1,12 @@
 +++
 title = "Introduction"
+date = 2025-11-19
+updated = 2025-11-19
 +++
 
 # AWS Services IPv6 Support Information
 
-Welcome, adventurer!!
+Welcome, adventurer!
 
 **This page is work in progress. Maybe in a few weeks?**
 
