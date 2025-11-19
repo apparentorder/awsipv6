@@ -1,7 +1,7 @@
 import os
 import sqlite3
 
-epdb = sqlite3.connect("output/endpoints.sqlite")
+epdb = sqlite3.connect("web/zola/static/endpoints.sqlite")
 epdb.row_factory = sqlite3.Row
 
 cur = epdb.execute("""

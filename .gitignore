@@ -13,3 +13,8 @@ web/src/.generated-endpoint-changes.text
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+web/zola/public
+web/zola/static
+web/zola/generated
+

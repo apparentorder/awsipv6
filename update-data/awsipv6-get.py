@@ -137,9 +137,9 @@ print()
 # ----------------------------------------------------------------------
 # write json output
 
-print(f"Writing output to output/endpoints.json ...")
+print(f"Writing output to web/zola/static/endpoints.json ...")
 
-with open(f"output/endpoints.json", "w") as json_file:
+with open(f"web/zola/static/endpoints.json", "w") as json_file:
     json.dump(sec.data(), json_file, indent = 4)
 
 print()
@@ -147,21 +147,21 @@ print()
 # ----------------------------------------------------------------------
 # write text output
 
-print(f"Writing output to output/endpoints.text ...")
+print(f"Writing output to web/zola/static/endpoints.text ...")
 
 all_endpoints_text = []
 for sep in sec.endpoints:
     all_endpoints_text += [f"{sep.endpoint_default} (default)"] if sep.endpoint_default.hostname else []
     all_endpoints_text += [f"{sep.endpoint_dualstack} (dualstack)"] if sep.endpoint_dualstack.hostname else []
 
-with open(f"output/endpoints.text", "w") as text_file:
+with open(f"web/zola/static/endpoints.text", "w") as text_file:
     for ep in sorted(all_endpoints_text):
         print(f"{ep}", file = text_file)
 
 # ----------------------------------------------------------------------
 # write sqlite output
 
-sqlite_path = "output/endpoints.sqlite"
+sqlite_path = "web/zola/static/endpoints.sqlite"
 print(f"Writing output to {sqlite_path} ...")
 
 with sqlite3.connect(sqlite_path) as conn_sqlite:

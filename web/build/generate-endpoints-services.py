@@ -3,7 +3,7 @@
 import os
 import sqlite3
 
-epdb = sqlite3.connect("output/endpoints.sqlite")
+epdb = sqlite3.connect("web/zola/static/endpoints.sqlite")
 epdb.row_factory = sqlite3.Row
 
 region_count = epdb.execute("SELECT count(*) AS c FROM region").fetchone()["c"]
@@ -92,7 +92,7 @@ for row in cur.fetchall():
     html_tooltip += f'</div>' # service details / regions
     html_tooltip += f'</div>' # stauts-bar-content
 
-    open(f"output/endpoints-services/endpoints-services-tooltip-{row['service_name']}.html", 'w').write(html_tooltip)
+    open(f"web/zola/static/endpoints-services/endpoints-services-tooltip-{row['service_name']}.html", 'w').write(html_tooltip)
 
 html += '</tbody>\n'
 html += '</table>\n'

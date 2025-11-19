@@ -19,7 +19,7 @@ html_out = f'''
     <div>
 '''
 
-with open("output/changes") as f:
+with open("web/zola/static/changes") as f:
     data_tags_open = False
     date_count = 0
     for line in f.readlines():
