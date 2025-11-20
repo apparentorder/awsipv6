@@ -47,92 +47,93 @@ print()
 # ----------------------------------------------------------------------
 # write database output
 
-print(f"Writing output to DSQL at {os.environ.get('DSQL_ENDPOINT')} ...")
+if False:
+    print(f"Writing output to DSQL at {os.environ.get('DSQL_ENDPOINT')} ...")
 
-dsql_client = boto3.client('dsql')
-dsql_token = dsql_client.generate_db_connect_admin_auth_token(Hostname = os.environ.get('DSQL_ENDPOINT'))
-conn = psycopg.connect(
-    host = os.environ.get('DSQL_ENDPOINT'),
-    dbname = 'postgres',
-    user = 'admin',
-    password = dsql_token,
-    sslmode = 'require',
-)
+    dsql_client = boto3.client('dsql')
+    dsql_token = dsql_client.generate_db_connect_admin_auth_token(Hostname = os.environ.get('DSQL_ENDPOINT'))
+    conn = psycopg.connect(
+        host = os.environ.get('DSQL_ENDPOINT'),
+        dbname = 'postgres',
+        user = 'admin',
+        password = dsql_token,
+        sslmode = 'require',
+    )
 
-with conn.cursor() as cur:
-    insert_sql = """
-        INSERT INTO endpoint (
-            service_name,
-            partition_name,
-            region_name,
-            endpoint_default_hostname,
-            endpoint_default_has_ipv4,
-            endpoint_default_has_ipv6,
-            endpoint_dualstack_hostname,
-            endpoint_dualstack_has_ipv4,
-            endpoint_dualstack_has_ipv6
-        )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (service_name, partition_name, region_name)
-        DO UPDATE SET
-            endpoint_default_hostname = EXCLUDED.endpoint_default_hostname,
-            endpoint_default_has_ipv4 = EXCLUDED.endpoint_default_has_ipv4,
-            endpoint_default_has_ipv6 = EXCLUDED.endpoint_default_has_ipv6,
-            endpoint_dualstack_hostname = EXCLUDED.endpoint_dualstack_hostname,
-            endpoint_dualstack_has_ipv4 = EXCLUDED.endpoint_dualstack_has_ipv4,
-            endpoint_dualstack_has_ipv6 = EXCLUDED.endpoint_dualstack_has_ipv6;
-    """
+    with conn.cursor() as cur:
+        insert_sql = """
+            INSERT INTO endpoint (
+                service_name,
+                partition_name,
+                region_name,
+                endpoint_default_hostname,
+                endpoint_default_has_ipv4,
+                endpoint_default_has_ipv6,
+                endpoint_dualstack_hostname,
+                endpoint_dualstack_has_ipv4,
+                endpoint_dualstack_has_ipv6
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (service_name, partition_name, region_name)
+            DO UPDATE SET
+                endpoint_default_hostname = EXCLUDED.endpoint_default_hostname,
+                endpoint_default_has_ipv4 = EXCLUDED.endpoint_default_has_ipv4,
+                endpoint_default_has_ipv6 = EXCLUDED.endpoint_default_has_ipv6,
+                endpoint_dualstack_hostname = EXCLUDED.endpoint_dualstack_hostname,
+                endpoint_dualstack_has_ipv4 = EXCLUDED.endpoint_dualstack_has_ipv4,
+                endpoint_dualstack_has_ipv6 = EXCLUDED.endpoint_dualstack_has_ipv6;
+        """
 
-    insert_region_sql = """
-        INSERT INTO region (
-            region_name,
-            partition_name,
-            description
-        )
-        VALUES (%s, %s, %s)
-        ON CONFLICT (region_name, partition_name)
-        DO UPDATE SET description = EXCLUDED.description;
-    """
-
-    for region_name, region_data in sec.all_regions.items():
-        # Process all records by region so that each COMMIT covers a few hundred records,
-        # aligning nicely with DSQL's row limit.
-        partition_name = region_data['partition']
-
-        print(f"* {region_name} ...")
-
-        t0 = time.perf_counter()
-
-        cur.execute(insert_region_sql, (
+        insert_region_sql = """
+            INSERT INTO region (
                 region_name,
                 partition_name,
-                region_data['description'],
-            ),
-            prepare = True,
-        )
+                description
+            )
+            VALUES (%s, %s, %s)
+            ON CONFLICT (region_name, partition_name)
+            DO UPDATE SET description = EXCLUDED.description;
+        """
 
-        insert_count = 0
-        for sep in filter(lambda ep: ep.region_name == region_name, sec.endpoints):
-            insert_count += 1
-            cur.execute(insert_sql, (
-                sep.service_name,
-                sep.partition_name,
-                sep.region_name,
-                sep.endpoint_default.hostname,
-                sep.endpoint_default.has_ipv4,
-                sep.endpoint_default.has_ipv6,
-                sep.endpoint_dualstack.hostname,
-                sep.endpoint_dualstack.has_ipv4,
-                sep.endpoint_dualstack.has_ipv6,
-            ))
+        for region_name, region_data in sec.all_regions.items():
+            # Process all records by region so that each COMMIT covers a few hundred records,
+            # aligning nicely with DSQL's row limit.
+            partition_name = region_data['partition']
 
-        conn.commit()
+            print(f"* {region_name} ...")
 
-        t = time.perf_counter() - t0
-        print(f'  transaction duration {t:.3f} seconds; insert count: {insert_count}')
-        print()
+            t0 = time.perf_counter()
 
-print()
+            cur.execute(insert_region_sql, (
+                    region_name,
+                    partition_name,
+                    region_data['description'],
+                ),
+                prepare = True,
+            )
+
+            insert_count = 0
+            for sep in filter(lambda ep: ep.region_name == region_name, sec.endpoints):
+                insert_count += 1
+                cur.execute(insert_sql, (
+                    sep.service_name,
+                    sep.partition_name,
+                    sep.region_name,
+                    sep.endpoint_default.hostname,
+                    sep.endpoint_default.has_ipv4,
+                    sep.endpoint_default.has_ipv6,
+                    sep.endpoint_dualstack.hostname,
+                    sep.endpoint_dualstack.has_ipv4,
+                    sep.endpoint_dualstack.has_ipv6,
+                ))
+
+            conn.commit()
+
+            t = time.perf_counter() - t0
+            print(f'  transaction duration {t:.3f} seconds; insert count: {insert_count}')
+            print()
+
+    print()
 
 # ----------------------------------------------------------------------
 # write json output

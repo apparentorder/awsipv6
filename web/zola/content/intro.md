@@ -18,6 +18,9 @@ Around 50% of all clients globally now have IPv6 connectivity. In many countries
 reduces latency for end users! ([Google IPv6
 statistics](https://www.google.com/intl/en/ipv6/statistics.html#tab=per-country-ipv6-adoption))
 
+Many governments now have mandated deadlines for IPv6 support in their systems, with some
+governments even setting an [end date for IPv4 support](https://konecipv4.cz/en/).
+
 IPv4 usually requires NAT, and AWS Managed NAT Gateway's per-gigabyte traffic charges
 can be an absurdly high line item.
 
@@ -26,7 +29,21 @@ guesswork, no more address collisions.
 
 This site provides up-to-date technical information to get you started with IPv6 on AWS.
 
-## Overview
+## Topics
+
+<div hx-boost="true"> <!-- make internal links more enjoyable here as well -->
+
+### Service API Endpoints
+
+Years ago, this site started as single page providing detailed data on IPv6 support for public AWS
+service API endpoints. A modernized version of the original [full endpoints matrix is available
+here](@/endpoints-matrix.md), in addition to a new [summary page](@/endpoints-services.md) for those
+endpoints.
+
+## Other Topics
+
+> **This page is work in progress.** The sections mentioned below are stubs for now and will be
+> filled with content soon™.
 
 ### IPv6 Connectivity
 
@@ -41,15 +58,10 @@ AWS and third-party services like Docker Hub using IPv6 (reducing NAT Gateway tr
 An introduction to [using the AWS SDKs](@/sdk-programming.md) with IPv6, which isn't as
 straight-forward as you'd expect.
 
-### Service API Endpoints
-
-Years ago, this site started as single page providing detailed data on IPv6 support for public AWS
-service API endpoints. A modernized version of the original full endpoints matrix is available
-[here](@/endpoints-matrix.md), in addition to a new [summary](@/endpoints-services.md) for those
-endpoints.
-
 ## Audience
 
 The information on this site assumes familiarity with IPv6 in general. If you are not familiar with
 IPv6, check out [book6](https://github.com/becarpenter/book6/blob/main/Contents.md), *"a practical
 introduction to IPv6 for technical people".*
+
+</div>

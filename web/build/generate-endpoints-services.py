@@ -63,8 +63,8 @@ pie_conic_gradient_str = ", ".join(parts)
 # -----
 
 html = f'''
-    <h1>Summary chart</h1>
-    <div class="text-sm text-gray-400 max-w-prose">
+    <h1>Summary</h1>
+    <div class="text-sm max-w-prose">
         This summary chart shows how many AWS services support IPv6 client applications
         on their public API endpoints.
     </div>
@@ -73,7 +73,7 @@ html = f'''
         <div class="pie-chart-container">
             <div class="pie-chart" style="background: conic-gradient({pie_conic_gradient_str});"></div>
         </div>
-        <div class="pie-legend">
+        <div class="pie-legend self-center">
             <div class="pie-legend-item">
                 <span class="pie-legend-color endpoint-ipv6"></span>
                 IPv6 by default: {cat_count_str["all_ipv6_default"]}
@@ -92,7 +92,8 @@ html = f'''
             </div>
             <div class="text-xs text-gray-400 max-w-prose">
                 Services total: {total_services}. Data for AWS commercial regions only, as
-                the China / GovCloud / EU Sovereign Cloud partitions have significant differences.
+                there are significant differences for the other AWS partitions (China /
+                GovCloud / "Secret Cloud" / EU Sovereign Cloud).
             </div>
         </div>
     </div>
@@ -113,8 +114,11 @@ cur = epdb.execute("""
 """)
 
 html += f'''
-    <h1>IPv6 progress by service</h1>
-    <table class="progress-table font-light">
+    <h1>IPv6 Progress by Service</h1>
+    <div class="text-xs text-gray-400 max-w-prose">
+        This shows, for each service and IPv6 support level, the number of regions (including other AWS partitions). Hover for details.
+    </div>
+    <div class="mt-2"> <table class="progress-table font-light">
         <thead>
             <tr class="text-left">
                 <th>Service</th>
@@ -184,6 +188,6 @@ for row in cur.fetchall():
     open(f"web/zola/static/endpoints-services/endpoints-services-tooltip-{row['service_name']}.html", 'w').write(html_tooltip)
 
 html += '</tbody>\n'
-html += '</table>\n'
+html += '</table> </div>\n'
 
 open("web/zola/generated/endpoints-services.html", 'w').write(html)

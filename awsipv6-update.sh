@@ -69,9 +69,9 @@ if test -s "$changes_today"; then
 fi
 cat "$changes_prev" >> "$changes_output"
 
-if test "$SKIP_GET" -ne 1; then
-    python3 -u update-data/awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > web/zola/static/endpoints.html
-fi
+# if test "$SKIP_GET" -ne 1; then
+#     python3 -u update-data/awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > web/zola/static/endpoints.html
+# fi
 
 for dir in \
     web/zola/generated \
@@ -103,7 +103,4 @@ gzip --best --keep --force web/zola/static/endpoints.json
 
 zola --root web/zola build --base-url "$URLBASE" --force
 
-aws s3 sync --delete web/zola/public/ "$S3BASE"/
-
-# npx cdk diff   $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
-# npx cdk deploy $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
+aws s3 sync web/zola/public/ "$S3BASE"/

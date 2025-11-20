@@ -66,37 +66,19 @@ class Awsipv6CdnStack(cdk.Stack):
             enable_ipv6 = True,
             # default_root_object = "awsipv6-main",
             http_version = cloudfront.HttpVersion.HTTP2_AND_3,
-            default_root_object = "awsipv6-main",
+            default_root_object = "intro/index.html",
             default_behavior = cloudfront.BehaviorOptions(
                 origin = s3_origin,
                 viewer_protocol_policy = cloudfront.ViewerProtocolPolicy.ALLOW_ALL,
                 # It seems necessary to pass the headers to the origin so that Cloudfront actually does compression.
                 origin_request_policy = cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
                 cache_policy = cf_cache_policy,
+                function_associations = [cloudfront.FunctionAssociation(
+                    function = cf_index_function,
+                    event_type = cloudfront.FunctionEventType.VIEWER_REQUEST,
+                )],
             ),
             additional_behaviors = {
-                "/awsipv6-*": cloudfront.BehaviorOptions(
-                    origin = cloudfront_origins.FunctionUrlOrigin.with_origin_access_control(
-                        live_stack.backend_function_url,
-                        origin_id = "awsipv6-lambda-live",
-                    ),
-                    viewer_protocol_policy = cloudfront.ViewerProtocolPolicy.ALLOW_ALL,
-                    cache_policy = cf_cache_policy,
-                    allowed_methods = cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
-                    origin_request_policy = cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
-                    response_headers_policy = cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS_WITH_PREFLIGHT,
-                ),
-                "/beta/awsipv6-*": cloudfront.BehaviorOptions(
-                    origin = cloudfront_origins.FunctionUrlOrigin.with_origin_access_control(
-                        beta_stack.backend_function_url,
-                        origin_id = "awsipv6-lambda-beta",
-                    ),
-                    viewer_protocol_policy = cloudfront.ViewerProtocolPolicy.ALLOW_ALL,
-                    cache_policy = cloudfront.CachePolicy.CACHING_DISABLED, # differs from live
-                    allowed_methods = cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
-                    origin_request_policy = cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
-                    response_headers_policy = cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS_WITH_PREFLIGHT,
-                ),
                 "/beta/*": cloudfront.BehaviorOptions(
                     origin = s3_origin,
                     viewer_protocol_policy = cloudfront.ViewerProtocolPolicy.ALLOW_ALL,
