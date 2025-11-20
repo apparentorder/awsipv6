@@ -9,6 +9,96 @@ epdb.row_factory = sqlite3.Row
 region_count = epdb.execute("SELECT count(*) AS c FROM region").fetchone()["c"]
 
 cur = epdb.execute("""
+    WITH s AS (
+        SELECT
+            service_name,
+            sum(endpoint_default_has_ipv6) as ipv6_default_count,
+            sum(endpoint_dualstack_has_ipv6) as ipv6_dualstack_count,
+            sum(endpoint_default_has_ipv4) as count_active
+        FROM endpoint
+        WHERE partition_name = 'aws'
+        GROUP BY service_name
+    )
+
+    SELECT
+        service_name,
+        CASE
+            WHEN ipv6_default_count > 0 AND ipv6_default_count = count_active THEN 'all_ipv6_default'
+            WHEN ipv6_dualstack_count > 0 AND ipv6_dualstack_count = count_active THEN 'all_ipv6_dualstack'
+            WHEN ipv6_default_count = 0 AND ipv6_dualstack_count = 0 THEN 'all_ipv4_only'
+            ELSE 'mixed'
+        END AS category
+    FROM s
+    WHERE count_active > 0
+""")
+
+service_categories = {'all_ipv6_default': 0, 'all_ipv6_dualstack': 0, 'mixed': 0, 'all_ipv4_only': 0}
+total_services = 0
+
+for row in cur.fetchall():
+    total_services += 1
+    service_categories[row['category']] += 1
+
+# Build pie chart. Note: The angles are given as percentages, not degrees.
+colors = {
+    'all_ipv6_default': 'var(--color-endpoint-ipv6)',
+    'all_ipv6_dualstack': 'var(--color-endpoint-ipv6-dualstack)',
+    'mixed': 'var(--color-endpoint-mixed)',
+    'all_ipv4_only': 'var(--color-endpoint-ipv4)',
+}
+parts = []
+angles = {}
+current_angle = 0
+cat_count_str = {}
+for cat in ['all_ipv6_default', 'all_ipv6_dualstack', 'mixed', 'all_ipv4_only']:
+    cat_percent = (service_categories[cat] / total_services) * 100
+    parts.append(f'{colors[cat]} {current_angle:.1f}% {current_angle + cat_percent:.1f}%')
+
+    cat_count_str[cat] = f'{service_categories[cat]} service{"" if service_categories[cat] == 1 else "s"} ({cat_percent:.0f}%)'
+
+    current_angle += cat_percent
+
+pie_conic_gradient_str = ", ".join(parts)
+
+# -----
+
+html = f'''
+    <h1>Summary chart</h1>
+    <div class="text-sm text-gray-400 max-w-prose">
+        This summary chart shows how many AWS services support IPv6 client applications
+        on their public API endpoints.
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-4">
+        <div class="pie-chart-container">
+            <div class="pie-chart" style="background: conic-gradient({pie_conic_gradient_str});"></div>
+        </div>
+        <div class="pie-legend">
+            <div class="pie-legend-item">
+                <span class="pie-legend-color endpoint-ipv6"></span>
+                IPv6 by default: {cat_count_str["all_ipv6_default"]}
+            </div>
+            <div class="pie-legend-item">
+                <span class="pie-legend-color endpoint-ipv6-dualstack"></span>
+                IPv6 with SDK opt-in: {cat_count_str["all_ipv6_dualstack"]}
+            </div>
+            <div class="pie-legend-item">
+                <span class="pie-legend-color endpoint-mixed"></span>
+                Inconsistent across regions: {cat_count_str["mixed"]}
+            </div>
+            <div class="pie-legend-item">
+                <span class="pie-legend-color endpoint-ipv4"></span>
+                IPv4 only: {cat_count_str["all_ipv4_only"]}
+            </div>
+            <div class="text-xs text-gray-400 max-w-prose">
+                Services total: {total_services}. Data for AWS commercial regions only, as
+                the China / GovCloud / EU Sovereign Cloud partitions have significant differences.
+            </div>
+        </div>
+    </div>
+'''
+
+cur = epdb.execute("""
     SELECT
         service_name,
         sum(endpoint_default_has_ipv6) as ipv6_default_count,
@@ -22,9 +112,8 @@ cur = epdb.execute("""
         service_name
 """)
 
-html = f'''
-    <!-- file: {os.path.basename(__file__)} -->
-
+html += f'''
+    <h1>IPv6 progress by service</h1>
     <table class="progress-table font-light">
         <thead>
             <tr class="text-left">

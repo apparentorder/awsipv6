@@ -57,8 +57,8 @@ code {
 }
 
 .pie-chart {
-    width: 300px;
-    height: 300px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
 }
 
@@ -194,4 +194,8 @@ main ol {
 
 main li {
   @apply mb-1;
+}
+
+blockquote {
+  @apply ml-4 my-1 border-l-4 border-orange-600 pl-3 pt-2 pb-1 bg-orange-50 italic text-gray-700 rounded;
 }

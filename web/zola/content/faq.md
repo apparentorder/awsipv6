@@ -6,7 +6,7 @@ updated = 2025-11-19
 
 # Frequently Asked Questions
 
-## This page is work in progress. Maybe in a few weeks?
+> **This page is work in progress.** Maybe in a few weeks?
 
 This page will host FAQs regarding IPv6 support on AWS in general.
 It will also cover a few items for this site, mainly regarding the service endpoint data
