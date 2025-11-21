@@ -3,6 +3,7 @@ import os
 import psycopg
 import sys
 import time
+import pathlib
 
 # ----------------------------------------------------------------------
 # take care of importing botocore from a git clone
@@ -163,6 +164,7 @@ with open(f"web/zola/static/endpoints.text", "w") as text_file:
 # write sqlite output
 
 sqlite_path = "web/zola/static/endpoints.sqlite"
+pathlib.Path(sqlite_path).unlink(missing_ok=True)
 print(f"Writing output to {sqlite_path} ...")
 
 with sqlite3.connect(sqlite_path) as conn_sqlite:
