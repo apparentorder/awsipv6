@@ -8,7 +8,7 @@ import html
 
 if len(sys.argv) < 2:
     raise Exception("need botocore repo directory")
-    
+
 botocore_repo = sys.argv[1]
 
 use_test_data = True
@@ -66,7 +66,7 @@ print('''<!doctype html>
 <meta name="description" content="A map to quickly identify which AWS services in your region support IPv6 by default and which require using a special dualstack endpoint">
 <meta property="og:description" content="A map to quickly identify which AWS services in your region support IPv6 by default and which require using a special dualstack endpoint">
 ''')
-print(f'<meta property="og:image" content="{base_url}/og-image.png">')
+print(f'<meta property="og:image" content="{base_url}/assets/og-image.png">')
 print('''
 <meta property="og:type" content="website">
 <link rel="stylesheet" href="assets/uglyshit.css">
@@ -141,13 +141,13 @@ if True: # settings
     print('<div id="filter-services">')
     print('<input type="search" autofocus class="box-border w-full border-2 rounded" id="search-service" pattern="[a-z0-9]*" oninput="updateSearch(this)">')
     print('</div>') # filter-services
-    
-    #print('<hr>')    
-    
-    print(f'<div class="select-v4only"><label><strong><input id="toggle-v4only" type="checkbox" checked onchange="toggleV4Only(this)"> Hide IPv4-only services</strong></label></div>')
-    
+
     #print('<hr>')
-    
+
+    print(f'<div class="select-v4only"><label><strong><input id="toggle-v4only" type="checkbox" checked onchange="toggleV4Only(this)"> Hide IPv4-only services</strong></label></div>')
+
+    #print('<hr>')
+
     #print('<div id="region-selection-dropdown">')
     #print('<p>')
     #print('<span class="anchor" onclick="toggleRegionDropdown(this)">&gt;&gt; <strong>Click here to select regions</strong></span>')
@@ -169,13 +169,13 @@ if True: # settings
         print(f'({region_description})')
         #print(f'</div>')
         print(f'</label></div>')
-        
+
     print('</div>')
     #print('</div>') # region-selection-items
     #print('</div>') # region-selection-dropdown
     #print('</p>')
 
-    
+
 print('</div>') # settings/sidebar
 
 
@@ -193,7 +193,7 @@ print('''
 #    <div class="inline-block py-2 sm:px-6 lg:px-8">
 #      <div class="overflow-hidden">
 #        <table class="text-center text-sm font-light">
-        
+
 print('<thead class="border-b font-medium dark:border-neutral-500">')
 print('<tr>')
 print("<th>Service</th>")
@@ -279,16 +279,16 @@ with open("output/changes") as f:
             if data_tags_open:
                 print('</ul>')
                 data_tags_open = False
-                
+
             # new date
             print(f'<div id="changes-date" class="text-sm space-y-1">{line}</div>')
             print(f'<ul id="changes-data" class="text-xs">')
             data_tags_open = True
-            
+
         else:
             line = re.sub(r'^(.)', r'\1 ', line) # add space
             print(f'<li><code>{html.escape(line)}</code></li>')
-            
+
     print('</ul>')
 
 print('</div>')
