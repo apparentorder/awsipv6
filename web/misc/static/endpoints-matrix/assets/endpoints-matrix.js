@@ -41,17 +41,11 @@ function setSelectedRegions(regionList) {
         ];
     }
 
-    this.selectedRegions = [... new Set(regionList)];
+    this.selectedRegions = [... new Set(regionList.filter((r) => r in this.allRegions))];
     window.localStorage.setItem('regionSelection', JSON.stringify(this.selectedRegions));
 }
 
 function initRegions() {
-    try {
-        setSelectedRegions(JSON.parse(window.localStorage.getItem('regionSelection')));
-    } catch(_) {
-        setSelectedRegions(undefined);
-    }
-
     const res = this.endpointsSqliteDatabase.exec(`
         SELECT region_name, partition_name, description
         FROM region
@@ -64,6 +58,12 @@ function initRegions() {
         const geoMatch = description.match(/\((.*)\)\s*$/);
         const shortDescription = geoMatch ? geoMatch[1] : description;
         this.allRegions[regionName] = { regionName, partitionName, description, shortDescription };
+    }
+
+    try {
+        setSelectedRegions(JSON.parse(window.localStorage.getItem('regionSelection')));
+    } catch(_) {
+        setSelectedRegions(undefined);
     }
 }
 
