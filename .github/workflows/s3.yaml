@@ -28,6 +28,7 @@ jobs:
           python3 -m venv .venv
           source .venv/bin/activate
           pip install -r update-data/requirements.txt
+          sudo snap install zola
       - name: build beta
         run: |
           source .venv/bin/activate
