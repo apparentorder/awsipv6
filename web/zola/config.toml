@@ -1,0 +1,10 @@
+base_url = "http://from-cli-arguments"
+title = "AWS Services IPv6 Support Information"
+description = "IPv6 support information for all AWS services, regions and endpoints"
+#default_language = "en"
+
+[extra]
+author = "apparentorder"
+
+[markdown]
+highlight_code = true

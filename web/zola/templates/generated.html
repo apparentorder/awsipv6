@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set html_path = "generated/" ~ page.relative_path | replace(from=".md", to = ".html") %}
+{% set html = load_data(path=html_path) %}
+{{ html | safe }}
+{% endblock content %}

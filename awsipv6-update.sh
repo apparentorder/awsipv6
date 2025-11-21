@@ -4,6 +4,7 @@ set -e
 
 BOTOCORE_REPO=~/environment/botocore
 S3BASE="s3://awsipv6/beta"
+URLBASE="https://awsipv6.neveragain.de/beta"
 CDK_DSQL_STACK_NAME="Awsipv6BetaStack"
 CDK_STACK_TO_DEPLOY="Awsipv6BetaStack"
 LIVE_ARG=""
@@ -15,6 +16,7 @@ if test "$1" = "--live"; then
     LIVE_ARG="--live"
     CDK_DSQL_STACK_NAME="Awsipv6Stack"
     CDK_STACK_TO_DEPLOY="--all"
+    URLBASE="https://awsipv6.neveragain.de"
     shift
 fi
 
@@ -23,10 +25,10 @@ if test "$1" = "--skip-get"; then
     shift
 fi
 
-rm -rf output
-mkdir output
-
-if test "$SKIP_GET" -ne 1; then
+if test "$SKIP_GET" = 1; then
+    # Keep previous change list if we do not collect new data.
+    aws s3 cp "$S3BASE"/endpoints.text web/zola/static/endpoints.text
+else
     if ! test -d "$BOTOCORE_REPO"; then
         git clone -b master https://github.com/boto/botocore.git "$BOTOCORE_REPO"
         sed -i.orig "s/^__version__ = '/__version__ = 'awsipv6-git-/" "$BOTOCORE_REPO/botocore/__init__.py"
@@ -39,12 +41,9 @@ if test "$SKIP_GET" -ne 1; then
         | jq -j '.Stacks[].Outputs[] | select(.OutputKey == "DsqlClusterEndpoint") | .OutputValue'
     )
     python3 -u update-data/awsipv6-get.py "$BOTOCORE_REPO" $LIVE_ARG
-else
-    # Keep previous change list if we do not collect new data.
-    aws s3 cp "$S3BASE"/endpoints.text output/endpoints.text
 fi
 
-changes_output="output/changes"
+changes_output="web/zola/static/changes"
 changes_prev=$(mktemp /tmp/awsipv6-changes_prev.XXXXXX)
 changes_today=$(mktemp /tmp/awsipv6-changes_today.XXXXXX)
 endpoints_text_prev=$(mktemp /tmp/awsipv6-text_prev.XXXXXX)
@@ -55,7 +54,7 @@ today=$(date +%Y-%m-%d)
 aws s3 cp "$S3BASE"/changes "$changes_prev"
 aws s3 cp "$S3BASE"/endpoints.text "$endpoints_text_prev"
 
-diff -wu0 "$endpoints_text_prev" output/endpoints.text \
+diff -wu0 "$endpoints_text_prev" web/zola/static/endpoints.text \
     | sed 1,2d \
     | grep -v 'amazonwebservices.com.cn ' \
     | grep -v 'amazonaws.com.cn ' \
@@ -70,25 +69,38 @@ if test -s "$changes_today"; then
 fi
 cat "$changes_prev" >> "$changes_output"
 
-if test "$SKIP_GET" -ne 1; then
-    python3 -u update-data/awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > output/endpoints.html
-fi
+# if test "$SKIP_GET" -ne 1; then
+#     python3 -u update-data/awsipv6-html.py "$BOTOCORE_REPO" $LIVE_ARG > web/zola/static/endpoints.html
+# fi
 
-# Bundle a copy with the function. Find a better way for this.
-cp "$changes_output" web/src/.generated-endpoint-changes.text
+for dir in \
+    web/zola/generated \
+    web/zola/static/assets \
+    web/zola/static/endpoints-matrix/assets \
+    web/zola/static/endpoints-services/assets; do
 
-npx tailwindcss -i web/static/uglyshit.tailwind -o output/uglyshit.css
-cp node_modules/htmx.org/dist/htmx.min.js output/htmx.min.js
+    if ! test -d "$dir"; then
+        mkdir -p "$dir"
+    fi
+done
 
-aws s3 sync output/ "$S3BASE"/
-aws s3 sync web/static/ "$S3BASE"/
+for f in web/build/generate*py; do
+    python3 $f
+done
 
-pip install \
-    --platform manylinux2014_aarch64 \
-    --python-version 3.13 \
-    --target .pydep/python \
-    --only-binary=:all: \
-    psycopg psycopg-binary
+npx tailwindcss -i web/misc/uglyshit.tailwind -o web/zola/static/assets/uglyshit.css
 
-npx cdk diff   $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
-npx cdk deploy $CDK_STACK_TO_DEPLOY --app "python3 awsipv6-cdk.py"
+cp node_modules/htmx.org/dist/htmx.min.js web/zola/static/assets/htmx.min.js
+
+cp web/zola/static/endpoints.sqlite web/zola/static/endpoints-matrix/assets/endpoints.sqlite--but.cloudfront.does.not.want.to.compress.binary.data.so.lets.just.call.it.xml
+rsync -a --delete node_modules/sql.js/dist/ web/zola/static/endpoints-matrix/assets/sql.js/
+
+rsync -a web/misc/static/ web/zola/static/
+
+# provide .gz versions for smaller downloads
+gzip --best --keep --force web/zola/static/endpoints.sqlite
+gzip --best --keep --force web/zola/static/endpoints.json
+
+zola --root web/zola build --base-url "$URLBASE" --force
+
+aws s3 sync web/zola/public/ "$S3BASE"/
