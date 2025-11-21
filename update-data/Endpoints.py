@@ -63,6 +63,10 @@ class ServiceEndpointsCollection:
                 "description": "use2",
                 "partition": "aws",
             },
+            "us-west-1": {
+                "description": "usw1",
+                "partition": "aws",
+            },
             "eu-west-1": {
                 "description": "euw1",
                 "partition": "aws",
