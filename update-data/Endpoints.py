@@ -75,6 +75,22 @@ class ServiceEndpointsCollection:
                 "description": "cnn1",
                 "partition": "aws-cn",
             },
+            "ap-southeast-2": {
+                "description": "apse2",
+                "partition": "aws",
+            },
+            "ca-central-1": {
+                "description": "cac1",
+                "partition": "aws",
+            },
+            "us-east-1": {
+                "description": "use1",
+                "partition": "aws",
+            },
+            "us-gov-west-1": {
+                "description": "us-gov-w1",
+                "partition": "aws-us-gov",
+            },
         }
 
         self.all_services = [
