@@ -1,2 +1,5 @@
 User-agent: *    
 Allow: /
+
+Sitemap: https://awsipv6.neveragain.de/sitemap.xml
+
