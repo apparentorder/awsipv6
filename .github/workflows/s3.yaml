@@ -28,7 +28,11 @@ jobs:
           python3 -m venv .venv
           source .venv/bin/activate
           pip install -r update-data/requirements.txt
-          sudo snap install --edge zola
+      - name: install zola
+        run: |
+          wget https://github.com/getzola/zola/releases/download/v0.21.0/zola-v0.21.0-x86_64-unknown-linux-gnu.tar.gz
+          tar xf zola-v0.21.0-x86_64-unknown-linux-gnu.tar.gz
+          sudo install -m 755 zola /usr/local/bin/
       - name: build beta
         run: |
           source .venv/bin/activate
