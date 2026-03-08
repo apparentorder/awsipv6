@@ -76,7 +76,7 @@ for ep in endpoints:
         if ep_default.get('has_ipv6'):
             tags.append('ipv6')
         tags_str = " [" + ", ".join(tags) + "]" if tags else ""
-        all_endpoints_text.append(f"{hostname_default} (default){tags_str}")
+        all_endpoints_text.append(f"{hostname_default}{tags_str} (default)")
 
     if hostname_dualstack and hostname_dualstack != hostname_default:
         tags = []
@@ -85,7 +85,7 @@ for ep in endpoints:
         if ep_dualstack.get('has_ipv6'):
             tags.append('ipv6')
         tags_str = " [" + ", ".join(tags) + "]" if tags else ""
-        all_endpoints_text.append(f"{hostname_dualstack} (dualstack){tags_str}")
+        all_endpoints_text.append(f"{hostname_dualstack}{tags_str} (dualstack)")
 
 with open(f"web/zola/static/endpoints.text", "w") as text_file:
     for ep in sorted(all_endpoints_text):
