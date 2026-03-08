@@ -1,7 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="max-w-prose">
-{{ page.content | safe }}
+<div class="max-w-6xl mx-auto">
+  {% if page.path is containing("intro") %}
+    <div class="card-grid">
+      {{ page.content | safe }}
+    </div>
+  {% else %}
+    <div class="max-w-prose mx-auto">
+      {{ page.content | safe }}
+    </div>
+  {% endif %}
 </div>
 {% endblock content %}

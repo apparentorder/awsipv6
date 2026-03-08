@@ -17,36 +17,37 @@
 </head>
 
 <body class="flex flex-col min-h-screen">
+<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-orange-600 focus:text-white">Skip to content</a>
 <div class="sticky top-0">
-	<header class="bg-orange-600 text-white text-center text-lg py-1 font-semibold">{{ config.title }}</header>
-	<nav class="bg-gray-100" hx-boost="true" hx-push-url="true">
-		<button class="md:hidden p-1" hx-on:click="document.getElementById('nav-content').classList.toggle('hidden')">
+	<header class="nav-header">{{ config.title }}</header>
+	<nav class="bg-gray-100" hx-boost="true" hx-push-url="true" data-nav-close>
+		<button class="md:hidden p-1" aria-label="Toggle navigation" hx-on:click="document.getElementById('nav-content').classList.toggle('hidden')">
 			☰ Navigation
 		</button>
 		<div id="nav-content" class="hidden md:block">
 			<div class="grid grid-cols-1 md:grid-cols-[auto_1fr] py-1">
-				<div><span class="font-semibold px-2 md:px-4">AWS IPv6 Basics:</span></div>
+				<div><span class="nav-section-title">AWS IPv6 Basics:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
-					<li><a href="{{ get_url(path="@/intro.md") }}">Introduction</a></li>
-					<li><a href="{{ get_url(path="@/ingress.md") }}">Ingress</a></li>
-					<li><a href="{{ get_url(path="@/egress.md") }}">Egress</a></li>
-					<li><a href="{{ get_url(path="@/sdk-programming.md") }}">Programming/SDK</a></li>
-					<li><a href="{{ get_url(path="@/faq.md") }}">FAQ</a></li>
+					<li><a data-nav-link href="{{ get_url(path="@/intro.md") }}">Introduction</a></li>
+					<li><a data-nav-link href="{{ get_url(path="@/ingress.md") }}">Ingress</a></li>
+					<li><a data-nav-link href="{{ get_url(path="@/egress.md") }}">Egress</a></li>
+					<li><a data-nav-link href="{{ get_url(path="@/sdk-programming.md") }}">Programming/SDK</a></li>
+					<li><a data-nav-link href="{{ get_url(path="@/faq.md") }}">FAQ</a></li>
 					<!-- <li><a href="{{ get_url(path="@/resources.md") }}">Resources</a></li> -->
 				</ul></div>
-				<div><span class="font-semibold px-2 md:px-4">Service API endpoints:</span></div>
+				<div><span class="nav-section-title">Service API endpoints:</span></div>
 				<div><ul class="flex flex-col space-y-1 sm:flex-row sm:space-x-3 sm:space-y-0">
-					<li><a href="{{ get_url(path="@/endpoints-services.md") }}">Services</a></li>
+					<li><a data-nav-link href="{{ get_url(path="@/endpoints-services.md") }}">Services</a></li>
 					<!-- <li><a href="{{ get_url(path="@/endpoints-regions.md") }}">Regions</a></li> -->
-					<li><a href="{{ get_url(path="@/endpoints-matrix.md") }}">Matrix</a></li>
-					<li><a href="{{ get_url(path="@/endpoints-changes.md") }}">Changes</a></li>
+					<li><a data-nav-link href="{{ get_url(path="@/endpoints-matrix.md") }}">Matrix</a></li>
+					<li><a data-nav-link href="{{ get_url(path="@/endpoints-changes.md") }}">Changes</a></li>
 				</ul></div>
 			</div>
 		</div>
 	</nav>
 </div>
 
-<main class="p-1 md:p-4">
+<main id="main-content" class="p-1 md:p-4">
 {% block content %}
 {% endblock content %}
 </main>
@@ -60,5 +61,17 @@
 		This site is a personal project. It is not affiliated with Amazon Web Services (AWS).
 	</div>
 </footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	// Close mobile nav on link click using event delegation
+	document.querySelectorAll('[data-nav-close] a[data-nav-link]').forEach(function(link) {
+		link.addEventListener('click', function(e) {
+			if (window.innerWidth < 768) {
+				document.getElementById('nav-content').classList.add('hidden');
+			}
+		});
+	});
+});
+</script>
 </body>
 </html>

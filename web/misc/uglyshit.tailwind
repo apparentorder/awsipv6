@@ -35,6 +35,46 @@
   @apply bg-sky-200;
 }
 
+/* Navigation */
+.nav-header {
+  @apply bg-orange-600 text-white text-center text-lg py-1 font-semibold;
+}
+
+.nav-section-title {
+  @apply font-semibold px-2 md:px-4;
+}
+
+.nav-link {
+  @apply underline decoration-dotted text-orange-600;
+}
+
+/* Forms */
+.input-field {
+  @apply px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500;
+}
+
+/* Tables */
+.data-table {
+  @apply text-center text-xs w-full table-auto whitespace-nowrap;
+}
+
+/* Cards */
+.card {
+  @apply p-4 bg-white rounded shadow;
+}
+
+.card-grid {
+  @apply grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-2;
+}
+
+.card-grid-single {
+  @apply grid gap-4 grid-cols-1 md:grid-cols-1 md:max-w-2xl mx-auto;
+}
+
+.card-title {
+  @apply text-lg font-semibold mb-2 text-gray-800 border-b border-gray-200 pb-2;
+}
+
 a {
   @apply underline decoration-dotted text-orange-600;
 }

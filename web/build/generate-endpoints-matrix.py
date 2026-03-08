@@ -17,7 +17,7 @@ html = f'''
                             pattern="[a-z0-9]*"
                             placeholder="Filter services..."
                             hx-on:input="filterServices(this)"
-                            class="px-2 py-1 max-w-xs border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            class="input-field"
                         >
                     </label>
                 </div>
@@ -28,7 +28,7 @@ html = f'''
                             type="text"
                             id="region-search"
                             placeholder="Select regions..."
-                            class="w-80 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            class="input-field"
                             hx-on:input="filterRegions()"
                             hx-on:click="document.getElementById('region-dropdown').classList.remove('hidden')"
                         >
@@ -44,7 +44,7 @@ html = f'''
             <noscript>This requires JavaScript. Sorry, pal.</noscript>
 
             <div id="matrix-table-container"></div>
-                <table id="matrix-table" class="text-center text-xs w-full table-auto whitespace-nowrap">
+                <table id="matrix-table" class="data-table">
                     <caption id="matrix-table-caption" class="text-lg font-semibold">
                         <!-- js -->
                     </caption>

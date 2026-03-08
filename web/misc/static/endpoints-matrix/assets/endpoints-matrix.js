@@ -19,6 +19,35 @@ async function initSqliteFile() {
     initRegions();
 }
 
+function copyToClipboard(text, element) {
+    navigator.clipboard.writeText(text).then(() => {
+        if (element) {
+            const originalTitle = element.title;
+            element.title = 'Copied!';
+            element.style.color = '#22c55e';
+            setTimeout(() => {
+                element.title = originalTitle;
+                element.style.color = '';
+            }, 1500);
+        }
+    });
+}
+
+function handleCellClick(row, td) {
+    // Build comma-separated list of available hostnames
+    const hostnames = [];
+    if (row.endpoint_default_hostname) {
+        hostnames.push(row.endpoint_default_hostname);
+    }
+    if (row.endpoint_dualstack_hostname && row.endpoint_dualstack_hostname !== row.endpoint_default_hostname) {
+        hostnames.push(row.endpoint_dualstack_hostname);
+    }
+
+    if (hostnames.length > 0) {
+        copyToClipboard(hostnames.join(', '), td);
+    }
+}
+
 function setSelectedRegions(regionList) {
     try {
         if (!Array.isArray(regionList)) {
@@ -118,6 +147,12 @@ function loadEndpointsTable() {
         for (const regionName of regionNamesOrdered) {
             const row = stmt.getAsObject([serviceName, regionName]);
             const td = tr.insertCell(-1);
+
+            // Add click-to-copy handler
+            td.style.cursor = 'pointer';
+            td.title = 'Click to copy hostname(s)';
+            td.onclick = () => handleCellClick(row, td);
+
             const endpointClassDiv = td.appendChild(document.createElement('div'));
             const endpointClassSpan = endpointClassDiv.appendChild(document.createElement('span'));
 
@@ -177,6 +212,9 @@ function createTooltipDivForRow(row) {
     const tdDefaultHostname = trDefault.appendChild(document.createElement('td'));
     const codeDefaultHostname = tdDefaultHostname.appendChild(document.createElement('code'));
     codeDefaultHostname.textContent = row.endpoint_default_hostname;
+    codeDefaultHostname.title = 'Click to copy';
+    codeDefaultHostname.style.cursor = 'pointer';
+    codeDefaultHostname.onclick = () => copyToClipboard(row.endpoint_default_hostname, codeDefaultHostname);
 
     const tdDefaultExtra = trDefault.appendChild(document.createElement('td'));
 
@@ -204,6 +242,9 @@ function createTooltipDivForRow(row) {
     const tdDualstackHostname = trDualstack.appendChild(document.createElement('td'));
     const codeDualstackHostname = tdDualstackHostname.appendChild(document.createElement('code'));
     codeDualstackHostname.textContent = row.endpoint_dualstack_hostname;
+    codeDualstackHostname.title = 'Click to copy';
+    codeDualstackHostname.style.cursor = 'pointer';
+    codeDualstackHostname.onclick = () => copyToClipboard(row.endpoint_dualstack_hostname, codeDualstackHostname);
 
     const tdDualstackExtra = trDualstack.appendChild(document.createElement('td'));
 

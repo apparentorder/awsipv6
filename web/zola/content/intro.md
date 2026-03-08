@@ -4,9 +4,11 @@ date = 2025-11-19
 updated = 2025-11-19
 +++
 
+<div class="card" id="intro-card">
+
 # AWS IPv6 Information Hub
 
-Welcome, packet pilgrim!
+**Welcome, packet pilgrim!**
 
 ## Introduction
 
@@ -29,9 +31,13 @@ guesswork, no more address collisions.
 
 This site provides up-to-date technical information to get you started with IPv6 on AWS.
 
+</div>
+
+<div class="card" id="topics-card">
+
 ## Topics
 
-<div hx-boost="true"> <!-- make internal links more enjoyable here as well -->
+<div hx-boost="true">
 
 ### Service API Endpoints
 
@@ -40,12 +46,9 @@ service API endpoints. A modernized version of the original [full endpoints matr
 here](@/endpoints-matrix.md), in addition to a new [summary page](@/endpoints-services.md) for those
 endpoints.
 
-## Other Topics
-
-> **This page is work in progress.** The sections mentioned below are stubs for now and will be
-> filled with content soon™.
-
 ### IPv6 Connectivity
+
+> **This section is a work in progress.** More content coming soon™.
 
 You will find information on [ingress](@/ingress.md) traffic -- that is, allowing IPv6 clients to
 connect to your services ...
@@ -57,6 +60,12 @@ AWS and third-party services like Docker Hub using IPv6 (reducing NAT Gateway tr
 
 An introduction to [using the AWS SDKs](@/sdk-programming.md) with IPv6, which isn't as
 straight-forward as you'd expect.
+
+</div>
+
+</div>
+
+<div class="card" id="audience-card">
 
 ## Audience
 

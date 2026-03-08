@@ -5,6 +5,3 @@ description = "IPv6 support information for all AWS services, regions and endpoi
 
 [extra]
 author = "apparentorder"
-
-[markdown]
-highlight_code = true

@@ -1,4 +1,18 @@
 #!/usr/bin/env python3
+"""
+AWS IPv6 Endpoint Data Collection
+
+This module provides functions to collect AWS service endpoint data,
+including IPv4/IPv6 support detection via DNS resolution.
+
+Functions:
+- get_available_services: Get list of available AWS services
+- get_all_regions: Get all AWS regions with partition info
+- resolve_endpoint: Resolve hostname and detect IPv4/IPv6 support
+- get_service_hostname: Get service endpoint hostname via botocore
+- collect_endpoints: Generator that yields endpoint data dicts
+- calculate_stats: Calculate statistics from endpoint list
+"""
 
 from botocore.regions import EndpointResolver
 import urllib
@@ -7,321 +21,359 @@ import botocore.exceptions
 import json
 import socket
 
-class ServiceEndpointsCollection:
-    def __init__(self, use_test_data = False):
-        self.botocore_session = botocore.session.get_session()
-        self.botocore_endpoint_resolver = self.botocore_session.get_component('endpoint_resolver')
-        self.botocore_endpoint_data = self.botocore_endpoint_resolver._endpoint_data
 
-        self.endpoints = []
-        self.service_lookup = {}
+# Service blacklist - services that require additional parameters
+SERVICE_BLACKLIST = {
+    "cloudfront-keyvaluestore": "KVS ARN must be provided to use this service",
+    "s3control": "ParamValidationError: Parameter validation failed: AccountId is required but not set",
+}
 
-        if use_test_data:
-            self._use_test_data()
-            return
+# Unsupported dualstack partitions
+UNSUPPORTED_DUALSTACK_PARTITIONS = ["aws-iso-e", "aws-iso-f"]
 
-        self.all_regions = {}
 
-        # some services require additional parameters that are not known to us.
-        # no option but to blacklist those services
-        self.service_blacklist = {
-            "cloudfront-keyvaluestore": "KVS ARN must be provided to use this service",
-            "s3control": "ParamValidationError: Parameter validation failed: AccountId is required but not set",
+# =============================================================================
+# Test Data
+# =============================================================================
+
+TEST_REGIONS = {
+    "eu-central-1": {
+        "description": "euc1",
+        "partition": "aws",
+    },
+    "us-east-2": {
+        "description": "use2",
+        "partition": "aws",
+    },
+    "us-west-1": {
+        "description": "usw1",
+        "partition": "aws",
+    },
+    "eu-west-1": {
+        "description": "euw1",
+        "partition": "aws",
+    },
+    "il-central-1": {
+        "description": "ilc1",
+        "partition": "aws",
+    },
+    "cn-north-1": {
+        "description": "cnn1",
+        "partition": "aws-cn",
+    },
+    "ap-southeast-2": {
+        "description": "apse2",
+        "partition": "aws",
+    },
+    "ca-central-1": {
+        "description": "cac1",
+        "partition": "aws",
+    },
+    "us-east-1": {
+        "description": "use1",
+        "partition": "aws",
+    },
+    "us-gov-west-1": {
+        "description": "us-gov-w1",
+        "partition": "aws-us-gov",
+    },
+}
+
+TEST_SERVICES = [
+    'apigateway',
+    'sts',
+    'ec2',
+    'iam',
+    'secretsmanager',
+]
+
+
+# =============================================================================
+# Core Functions
+# =============================================================================
+
+def get_botocore_session():
+    """Create and return a botocore session."""
+    return botocore.session.get_session()
+
+
+def get_available_services(botocore_session, use_test_data=False):
+    """
+    Get set of available AWS services.
+
+    Args:
+        botocore_session: Botocore session object
+        use_test_data: If True, return test services instead
+
+    Returns:
+        Set of service names
+    """
+    if use_test_data:
+        return set(TEST_SERVICES)
+
+    return set(botocore_session.get_available_services()) - set(SERVICE_BLACKLIST.keys())
+
+
+def get_all_regions(botocore_session, use_test_data=False):
+    """
+    Get all AWS regions with partition information.
+
+    Args:
+        botocore_session: Botocore session object
+        use_test_data: If True, return test regions instead
+
+    Returns:
+        Dict mapping region_name -> {description, partition}
+    """
+    if use_test_data:
+        return dict(TEST_REGIONS)
+
+    botocore_endpoint_resolver = botocore_session.get_component('endpoint_resolver')
+    botocore_endpoint_data = botocore_endpoint_resolver._endpoint_data
+
+    # Add unsupported partitions to botocore's list
+    botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS += UNSUPPORTED_DUALSTACK_PARTITIONS
+
+    all_regions = {}
+    for partition_data in botocore_endpoint_data['partitions']:
+        if partition_data['partition'] in UNSUPPORTED_DUALSTACK_PARTITIONS:
+            continue
+
+        for region_key, region_data in partition_data['regions'].items():
+            all_regions[region_key] = region_data
+            all_regions[region_key]['partition'] = partition_data['partition']
+
+    return all_regions
+
+
+def resolve_endpoint(hostname):
+    """
+    Resolve hostname and detect IPv4/IPv6 support via DNS.
+
+    Args:
+        hostname: The hostname to resolve
+
+    Returns:
+        dict: {hostname, has_ipv4, has_ipv6}
+    """
+    result = {
+        "hostname": hostname,
+        "has_ipv4": False,
+        "has_ipv6": False,
+    }
+
+    if hostname is None:
+        return result
+
+    try:
+        for (family, _socktype, _proto, _canon_name, _addr) in socket.getaddrinfo(hostname, 443):
+            result["has_ipv4"] |= (family == socket.AddressFamily.AF_INET)
+            result["has_ipv6"] |= (family == socket.AddressFamily.AF_INET6)
+    except socket.gaierror:
+        # Name not known, probably
+        pass
+
+    # If neither IP version resolved, clear hostname
+    if not result["has_ipv4"] and not result["has_ipv6"]:
+        result["hostname"] = None
+
+    return result
+
+
+def get_service_hostname(service_name, region_name, botocore_session, use_dualstack=False):
+    """
+    Get service endpoint hostname using botocore.
+
+    Args:
+        service_name: AWS service name (e.g., 'ec2')
+        region_name: AWS region (e.g., 'us-east-1')
+        botocore_session: Botocore session object
+        use_dualstack: If True, use dualstack endpoint
+
+    Returns:
+        Hostname string or None if not available
+    """
+    config = botocore.config.Config(
+        defaults_mode='standard',
+        use_dualstack_endpoint=use_dualstack
+    )
+
+    try:
+        aws_client = botocore_session.create_client(
+            service_name,
+            region_name=region_name,
+            config=config,
+        )
+    except botocore.exceptions.EndpointVariantError as e:
+        print(f"WARNING:  Resolving {service_name} in {region_name}: {e}")
+        return None
+
+    # Get any operation to resolve the endpoint
+    some_operation_name = list(aws_client._service_model._service_description['operations'].keys())[0]
+    operation_model = aws_client._service_model.operation_model(some_operation_name)
+
+    request_context = {
+        'client_region': aws_client.meta.region_name,
+        'client_config': aws_client.meta.config,
+        'has_streaming_input': operation_model.has_streaming_input,
+        'auth_type': operation_model.auth_type,
+    }
+
+    try:
+        result = aws_client._resolve_endpoint_ruleset(
+            operation_model,
+            {},  # api_params (we don't need those)
+            request_context=request_context
+        )
+        return urllib.parse.urlparse(result[0]).netloc
+    except Exception as e:
+        print(f"ERROR:  Resolving for service {service_name} in {region_name}: {e}")
+        return None
+
+
+def collect_endpoints(botocore_session, use_test_data=False):
+    """
+    Generator that yields endpoint data for all services in all regions.
+
+    Args:
+        botocore_session: Botocore session object
+        use_test_data: If True, use test data instead of live AWS data
+
+    Yields:
+        dict with endpoint data:
+        {
+            'service': str,
+            'partition': str,
+            'region': str,
+            'endpoint_default': {hostname, has_ipv4, has_ipv6},
+            'endpoint_dualstack': {hostname, has_ipv4, has_ipv6},
         }
+    """
+    all_services = get_available_services(botocore_session, use_test_data)
+    all_regions = get_all_regions(botocore_session, use_test_data)
 
-        self.all_services = set(self.botocore_session.get_available_services()) - set(self.service_blacklist.keys())
+    # Add unsupported partitions to botocore's list (needed for each new session)
+    botocore_endpoint_resolver = botocore_session.get_component('endpoint_resolver')
+    for partition in UNSUPPORTED_DUALSTACK_PARTITIONS:
+        if partition not in botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS:
+            botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS.append(partition)
 
-        # XXX: 2024-05-30: for some(?) "iso" regions, for all(?) services name -- including those that usually *do* have a dualstack
-        # endpoint --, botocore throws an exception:
-        #
-        #     botocore.exceptions.EndpointVariantError: Unable to construct a modeled endpoint with the following variant(s) ['dualstack']:
-        #
-        # Regions observed so far: eu-isoe-west-1 (2024-05-30), us-isof-east-1, us-isof-south-1, eusc-de-east-1 (all 2025-07-13).
-        #
-        # We will assume that these partitions do not support dualstack at all and should have been flagged accordingly.
-        # Exception: EU Sovereign Cloud (eusc), which will be an additional public commercial partition and deserves visibility.
-        #
-        # Revisit this in due time.
-        #
-        self.botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS += ["aws-iso-e", "aws-iso-f"]
+    for service_name in sorted(all_services):
+        for region_name, region_data in all_regions.items():
+            partition_name = region_data['partition']
 
-        for partition_data in self.botocore_endpoint_data['partitions']:
-            if partition_data['partition'] in self.botocore_endpoint_resolver._UNSUPPORTED_DUALSTACK_PARTITIONS:
-                continue
+            # Check if service is available in this region
+            service_regions = botocore_session.get_available_regions(service_name, partition_name)
 
-            for region_key, region_data in partition_data['regions'].items():
-                self.all_regions[region_key] = region_data
-                self.all_regions[region_key]['partition'] = partition_data['partition']
-
-    def _use_test_data(self):
-        self.all_regions = {
-            "eu-central-1": {
-                "description": "euc1",
-                "partition": "aws",
-            },
-            "us-east-2": {
-                "description": "use2",
-                "partition": "aws",
-            },
-            "us-west-1": {
-                "description": "usw1",
-                "partition": "aws",
-            },
-            "eu-west-1": {
-                "description": "euw1",
-                "partition": "aws",
-            },
-            "il-central-1": {
-                "description": "ilc1",
-                "partition": "aws",
-            },
-            "cn-north-1": {
-                "description": "cnn1",
-                "partition": "aws-cn",
-            },
-            "ap-southeast-2": {
-                "description": "apse2",
-                "partition": "aws",
-            },
-            "ca-central-1": {
-                "description": "cac1",
-                "partition": "aws",
-            },
-            "us-east-1": {
-                "description": "use1",
-                "partition": "aws",
-            },
-            "us-gov-west-1": {
-                "description": "us-gov-w1",
-                "partition": "aws-us-gov",
-            },
-        }
-
-        self.all_services = [
-            'apigateway',
-            'sts',
-            'ec2',
-            'iam',
-            'secretsmanager',
-         ]
-
-    def stats(self):
-        # note: SEPs that are not present (service not supported in a region) do not count.
-        se_count = 0
-        se_count_ipv6_default = 0
-        se_count_ipv6_dualstack = 0
-        se_count_ipv4_only = 0
-        se_count_nx = 0
-
-        for sep in self.endpoints:
-            if not sep.endpoint_default.hostname and not sep.endpoint_dualstack.hostname:
-                se_count_nx += 1
-            elif sep.endpoint_default.has_ipv6:
-                se_count += 1
-                se_count_ipv6_default += 1
-            elif sep.endpoint_dualstack.has_ipv6:
-                se_count += 1
-                se_count_ipv6_dualstack += 1
+            if len(service_regions) > 0 and region_name not in service_regions:
+                # Service not available in this region
+                endpoint_default = resolve_endpoint(None)
+                endpoint_dualstack = resolve_endpoint(None)
             else:
-                se_count += 1
-                se_count_ipv4_only += 1
+                # Get default endpoint
+                hostname_default = get_service_hostname(
+                    service_name, region_name, botocore_session, use_dualstack=False
+                )
+                endpoint_default = resolve_endpoint(hostname_default)
 
-        return {
-            "count_total": se_count + se_count_nx,
-            "count_enabled": se_count,
-            "count_ipv6_default": se_count_ipv6_default,
-            "count_ipv6_dualstack": se_count_ipv6_dualstack,
-            "count_ipv4_only": se_count_ipv4_only,
-            "count_nx": se_count_nx,
+                # Get dualstack endpoint (if different)
+                hostname_dualstack = get_service_hostname(
+                    service_name, region_name, botocore_session, use_dualstack=True
+                )
+
+                if hostname_dualstack != hostname_default:
+                    endpoint_dualstack = resolve_endpoint(hostname_dualstack)
+                else:
+                    # Same as default or not supported
+                    endpoint_dualstack = resolve_endpoint(None)
+
+            yield {
+                'service': service_name,
+                'partition': partition_name,
+                'region': region_name,
+                'endpoint_default': endpoint_default,
+                'endpoint_dualstack': endpoint_dualstack,
+            }
+
+
+def calculate_stats(endpoints):
+    """
+    Calculate statistics from endpoint list.
+
+    Args:
+        endpoints: List of endpoint dicts
+
+    Returns:
+        dict with statistics:
+        {
+            'count_total': int,
+            'count_enabled': int,
+            'count_ipv6_default': int,
+            'count_ipv6_dualstack': int,
+            'count_ipv4_only': int,
+            'count_nx': int,
         }
+    """
+    se_count = 0
+    se_count_ipv6_default = 0
+    se_count_ipv6_dualstack = 0
+    se_count_ipv4_only = 0
+    se_count_nx = 0
 
-    def add(self, service_name, partition_name, region_name):
-        sep = ServiceEndpoints(
-            service_name = service_name,
-            partition_name = partition_name,
-            region_name = region_name,
-            botocore_session = self.botocore_session
-        )
+    for ep in endpoints:
+        ep_default = ep.get('endpoint_default', {})
+        ep_dualstack = ep.get('endpoint_dualstack', {})
 
-        self.endpoints += [sep]
-        self.service_lookup[f'{sep.partition_name}:{sep.service_name}:{sep.region_name}'] = sep
+        hostname_default = ep_default.get('hostname')
+        hostname_dualstack = ep_dualstack.get('hostname')
 
-    def data(self):
-        return list(map(lambda sep: sep.data(), self.endpoints))
+        has_ipv6_default = ep_default.get('has_ipv6', False)
+        has_ipv6_dualstack = ep_dualstack.get('has_ipv6', False)
 
-    def load_json_file(self, json_file):
-        with open(json_file, "r") as f:
-            json_data = json.load(f)
-
-        for sep_data in json_data:
-            sep = ServiceEndpoints.from_data(sep_data)
-            self.endpoints += [sep]
-            self.service_lookup[f'{sep.partition_name}:{sep.service_name}:{sep.region_name}'] = sep
-
-class Endpoint:
-    def __init__(self, hostname, loaded = False):
-        self.hostname = hostname
-        self.has_ipv4 = False
-        self.has_ipv6 = False
-
-        if loaded:
-            return
-
-        if hostname is None:
-            return
-
-        self.resolve()
-
-        if not self.has_ipv4 and not self.has_ipv6:
-            self.hostname = None
-
-    @staticmethod
-    def from_data(data):
-        ep = Endpoint(data['hostname'], loaded = True)
-        ep.has_ipv4 = data['has_ipv4']
-        ep.has_ipv6 = data['has_ipv6']
-
-        return ep
-
-    def data(self):
-        r = {
-            "hostname": self.hostname,
-            "has_ipv4": self.has_ipv4,
-            "has_ipv6": self.has_ipv6,
-        }
-
-        return r
-
-    def __str__(self):
-        if self.hostname is None:
-            return ""
-
-        tags = []
-        tags_str = ""
-
-        tags += ["ipv4"] if self.has_ipv4 else []
-        tags += ["ipv6"] if self.has_ipv6 else []
-
-        if len(tags) > 0:
-            tags_str = " [" + ", ".join(tags) + "]"
-
-        return f"{self.hostname}{tags_str}"
-
-    def resolve(self):
-        self.has_ipv4 = False
-        self.has_ipv6 = False
-
-        #print(f"RESOLVE: {hostname}")
-        try:
-            for (family, _socktype, _proto, _canon_name, _addr) in socket.getaddrinfo(self.hostname, 443):
-                #print(f"{hostname} {addr[0]}")
-                self.has_ipv4 |= (family == socket.AddressFamily.AF_INET)
-                self.has_ipv6 |= (family == socket.AddressFamily.AF_INET6)
-        except socket.gaierror:
-            # name not known, probably.
-            pass
-
-class ServiceEndpoints:
-    def __init__(self, service_name, partition_name, region_name, botocore_session, loaded = False):
-        self.partition = partition_name
-        self.service_name = service_name
-        self.partition_name = partition_name
-        self.region_name = region_name
-        self.botocore_session = botocore_session
-        self.endpoint_default = None
-        self.endpoint_dualstack = None
-        self.deprecated = False
-        self.config_default = botocore.config.Config(defaults_mode = 'standard')
-        self.config_dualstack = botocore.config.Config(defaults_mode = 'standard', use_dualstack_endpoint = True)
-
-        if loaded:
-            return
-
-        # XXX: unfortunately, get_available_regions() works correctly for most services,
-        #      but fails for some services (e.g. for 'bedrock' or 'eks-auth' it returns
-        #      an empty list)  --  https://github.com/boto/botocore/issues/3028
-        #      we therefore only use it when it actually returns something.
-        service_regions = self.botocore_session.get_available_regions(service_name, partition_name)
-
-        if len(service_regions) > 0 and region_name not in service_regions:
-            self.endpoint_default = Endpoint(None)
-            self.endpoint_dualstack = Endpoint(None)
-            return
-
-        hostname_default = self._resolve_service_endpoint(service_name, region_name, config = self.config_default)
-        hostname_dualstack = self._resolve_service_endpoint(service_name, region_name, config = self.config_dualstack)
-
-        self.endpoint_default = Endpoint(hostname_default)
-
-        if hostname_dualstack != hostname_default:
-            self.endpoint_dualstack = Endpoint(hostname_dualstack)
+        if not hostname_default and not hostname_dualstack:
+            se_count_nx += 1
+        elif has_ipv6_default:
+            se_count += 1
+            se_count_ipv6_default += 1
+        elif has_ipv6_dualstack:
+            se_count += 1
+            se_count_ipv6_dualstack += 1
         else:
-            # for services that use the same endpoint for "dualstack", or don't
-            # support any separate dualstack endpoint at all, don't list the
-            # dualstack endpoint separately.
-            self.endpoint_dualstack = Endpoint(None)
+            se_count += 1
+            se_count_ipv4_only += 1
 
-    def _resolve_service_endpoint(self, service_name, region_name, config = None):
-        try:
-            aws_client = self.botocore_session.create_client(
-                service_name,
-                region_name = region_name,
-                config = config,
-            )
+    return {
+        "count_total": se_count + se_count_nx,
+        "count_enabled": se_count,
+        "count_ipv6_default": se_count_ipv6_default,
+        "count_ipv6_dualstack": se_count_ipv6_dualstack,
+        "count_ipv4_only": se_count_ipv4_only,
+        "count_nx": se_count_nx,
+    }
 
-        except botocore.exceptions.EndpointVariantError as e:
-            print(f"WARNING:  Resolving {service_name} in {region_name}: {e}")
-            return None
 
-        # proper usage of botocore's newer EndpointRulesetResolver infrastructure
-        # is tied to a single operation (an OperationModel); for our purposes, it
-        # doesn't matter which operation we pick, we just need to pick one.
-        some_operation_name = list(aws_client._service_model._service_description['operations'].keys())[0]
-        operation_model = aws_client._service_model.operation_model(some_operation_name)
+def load_endpoints_from_json(json_file):
+    """
+    Load endpoints from JSON file.
 
-        # the rest of this is based on botocore/client.py, BaseClient._make_api_call()
-        request_context = {
-            'client_region': aws_client.meta.region_name,
-            'client_config': aws_client.meta.config,
-            'has_streaming_input': operation_model.has_streaming_input,
-            'auth_type': operation_model.auth_type,
-        }
+    Args:
+        json_file: Path to JSON file
 
-        try:
-            result = aws_client._resolve_endpoint_ruleset(
-                operation_model,
-                {}, # api_params (we don't need those)
-                request_context = request_context
-            )
+    Returns:
+        List of endpoint dicts
+    """
+    with open(json_file, "r") as f:
+        return json.load(f)
 
-            return urllib.parse.urlparse(result[0]).netloc
 
-        except Exception as e:
-            print(f"ERROR:  Resolving for service {service_name} in region {region_name}: {e}")
-            return None
+# =============================================================================
+__all__ = [
+    'get_available_services',
+    'get_all_regions',
+    'resolve_endpoint',
+    'get_service_hostname',
+    'collect_endpoints',
+    'calculate_stats',
+    'load_endpoints_from_json',
+]
 
-    @staticmethod
-    def from_data(data):
-        sep = ServiceEndpoints(
-            service_name = data['service'],
-            partition_name = data['partition'],
-            region_name = data['region'],
-            botocore_session = None,
-            loaded = True
-        )
-
-        sep.endpoint_default = Endpoint.from_data(data['endpoint_default'])
-        sep.endpoint_dualstack = Endpoint.from_data(data['endpoint_dualstack'])
-
-        return sep
-
-    def data(self):
-        r = {
-            "service": self.service_name,
-            "partition": self.partition_name,
-            "region": self.region_name,
-            "endpoint_default": self.endpoint_default.data(),
-            "endpoint_dualstack": self.endpoint_dualstack.data(),
-        }
-
-        return r
