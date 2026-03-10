@@ -9,7 +9,7 @@ html_out = f'''
 
     <h1>Recent changes in public API endpoints</h1>
 
-    <div class="text-xs text-gray-500 font-light max-w-prose">
+    <div class="text-xs text-gray-500 dark:text-gray-400 font-light max-w-prose">
         This list is presented in <code>diff</code>-style output: Every
         endpoint beginning with a <code>+</code> was added, and every
         endpoint beginning with a <code>-</code> was removed &ndash; or

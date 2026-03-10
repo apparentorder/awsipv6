@@ -90,7 +90,7 @@ html = f'''
                 <span class="pie-legend-color endpoint-ipv4"></span>
                 IPv4 only: {cat_count_str["all_ipv4_only"]}
             </div>
-            <div class="text-xs text-gray-400 max-w-prose">
+            <div class="text-xs text-gray-400 dark:text-gray-500 max-w-prose">
                 Services total: {total_services}. Data for AWS commercial regions only, as
                 there are significant differences for the other AWS partitions (China /
                 GovCloud / "Secret Cloud" / EU Sovereign Cloud).
@@ -115,7 +115,7 @@ cur = epdb.execute("""
 
 html += f'''
     <h1>IPv6 Progress by Service</h1>
-    <div class="text-xs text-gray-400 max-w-prose">
+    <div class="text-xs text-gray-400 dark:text-gray-500 max-w-prose">
         This shows, for each service and IPv6 support level, the number of regions (including other AWS partitions). Hover for details.
     </div>
     <div class="mt-2"> <table class="progress-table font-light">

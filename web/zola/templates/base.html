@@ -4,6 +4,7 @@
 	<title>{{ page.title | default(value=config.title) }} | awsipv6</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="UTF-8">
+	<meta name="color-scheme" content="light dark">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta property="og:title" content="{{ page.title | default(value=config.title) }}">
 	<meta name="description" content="{{ page.description | default(value=config.description) }}">
@@ -14,13 +15,18 @@
 	<link rel="stylesheet" href="{{ config.base_url | safe }}/assets/uglyshit.css">
 	<link rel="stylesheet" href="{{ config.base_url | safe }}/assets/fonts.css">
 	<script defer src="{{ config.base_url | safe }}/assets/htmx.min.js"></script>
+	<style>
+		@media (prefers-color-scheme: dark) {
+			html { background: #111827; }
+		}
+	</style>
 </head>
 
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
 <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-orange-600 focus:text-white">Skip to content</a>
 <div class="sticky top-0">
 	<header class="nav-header">{{ config.title }}</header>
-	<nav class="bg-gray-100" hx-boost="true" hx-push-url="true" data-nav-close>
+	<nav class="bg-gray-100 dark:bg-gray-800" hx-boost="true" hx-push-url="true" data-nav-close>
 		<button class="md:hidden p-1" aria-label="Toggle navigation" hx-on:click="document.getElementById('nav-content').classList.toggle('hidden')">
 			☰ Navigation
 		</button>
@@ -52,7 +58,7 @@
 {% endblock content %}
 </main>
 
-<footer class="mt-auto border-t border-gray-300 p-1 text-xs bg-gray-100">
+<footer class="mt-auto border-t border-gray-300 dark:border-gray-600 p-1 text-xs bg-gray-100 dark:bg-gray-800">
 	<div>
 		Contact: <a href="https://x.com/apparentorder">@apparentorder</a> on 𝕏itter, or <a href="mailto:apparentorder@neveragain.de">e-mail</a>.
 	</div>

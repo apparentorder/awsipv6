@@ -15,33 +15,42 @@
   --color-endpoint-mixed: theme('colors.orange.200');
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-endpoint-ipv6: theme('colors.green.600');
+    --color-endpoint-ipv6-dualstack: theme('colors.sky.400');
+    --color-endpoint-ipv4: theme('colors.red.700');
+    --color-endpoint-mixed: theme('colors.orange.400');
+  }
+}
+
 .endpoint-nx {
-  @apply bg-slate-200;
+  @apply bg-slate-200 dark:bg-slate-700;
 }
 
 .endpoint-ipv4 {
-  @apply bg-red-200;
+  @apply bg-red-200 dark:bg-red-800;
 }
 
 .endpoint-ipv6 {
-  @apply bg-green-400;
+  @apply bg-green-400 dark:bg-green-700;
 }
 
 .endpoint-mixed {
-  @apply bg-orange-200;
+  @apply bg-orange-200 dark:bg-orange-700;
 }
 
 .endpoint-ipv6-dualstack {
-  @apply bg-sky-200;
+  @apply bg-sky-200 dark:bg-sky-700;
 }
 
 /* Navigation */
 .nav-header {
-  @apply bg-orange-600 text-white text-center text-lg py-1 font-semibold;
+  @apply bg-orange-600 dark:bg-orange-700 text-white text-center text-lg py-1 font-semibold;
 }
 
 .nav-section-title {
-  @apply font-semibold px-2 md:px-4;
+  @apply font-semibold px-2 md:px-4 dark:text-gray-200;
 }
 
 .nav-link {
@@ -50,7 +59,7 @@
 
 /* Forms */
 .input-field {
-  @apply px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500;
+  @apply px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-gray-100;
 }
 
 /* Tables */
@@ -60,7 +69,7 @@
 
 /* Cards */
 .card {
-  @apply p-4 bg-white rounded shadow;
+  @apply p-4 bg-white dark:bg-gray-800 rounded shadow;
 }
 
 .card-grid {
@@ -72,11 +81,11 @@
 }
 
 .card-title {
-  @apply text-lg font-semibold mb-2 text-gray-800 border-b border-gray-200 pb-2;
+  @apply text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600 pb-2;
 }
 
 a {
-  @apply underline decoration-dotted text-orange-600;
+  @apply underline decoration-dotted text-orange-600 dark:text-orange-400;
 }
 
 p {
@@ -84,7 +93,7 @@ p {
 }
 
 code {
-  @apply pl-0.5 pr-0.5 bg-gray-100 rounded-sm;
+  @apply pl-0.5 pr-0.5 bg-gray-100 dark:bg-gray-700 rounded-sm;
 }
 
 .htmx-request {
@@ -127,8 +136,8 @@ code {
 .progress-bar {
     border-radius: 2px;
     @apply border;
-    @apply border-gray-100;
-    @apply bg-gray-200;
+    @apply border-gray-100 dark:border-gray-700;
+    @apply bg-gray-200 dark:bg-gray-600;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
     display: flex;
     @apply w-full max-w-[500px];
@@ -146,7 +155,7 @@ code {
 }
 
 .progress-table tr:nth-child(odd) td:first-child {
-    @apply bg-gray-50;
+    @apply bg-gray-50 dark:bg-gray-700;
 }
 
 .progress-table td:first-child {
@@ -165,7 +174,7 @@ code {
 }
 
 #matrix-table-body tr:nth-child(odd) {
-    @apply bg-gray-50;
+    @apply bg-gray-50 dark:bg-gray-800;
 }
 
 #matrix-table-body th {
@@ -173,7 +182,7 @@ code {
 }
 
 #matrix-table-body td {
-  @apply border border-1 border-dotted border-gray-300;
+  @apply border border-1 border-dotted border-gray-300 dark:border-gray-600;
 }
 
 .matrix-tooltip-head {
@@ -197,31 +206,31 @@ code {
 .tooltip {
     visibility: hidden;
     position: absolute;
-    @apply border border-gray-300 bg-gray-100 rounded shadow-lg p-1 mt-8 w-auto max-w-[1000px];
+    @apply border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded shadow-lg p-1 mt-8 w-auto max-w-[1000px];
 }
 
 h1 {
-  @apply text-2xl font-bold mb-4 text-gray-800;
+  @apply text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100;
 }
 
 h2 {
-  @apply text-xl font-semibold mb-3 text-gray-700;
+  @apply text-xl font-semibold mb-3 text-gray-700 dark:text-gray-200;
 }
 
 h3 {
-  @apply text-lg font-medium mb-2 text-gray-600;
+  @apply text-lg font-medium mb-2 text-gray-600 dark:text-gray-300;
 }
 
 h4 {
-  @apply text-base font-medium mb-2 text-gray-600;
+  @apply text-base font-medium mb-2 text-gray-600 dark:text-gray-300;
 }
 
 h5 {
-  @apply text-sm font-medium mb-1 text-gray-600;
+  @apply text-sm font-medium mb-1 text-gray-600 dark:text-gray-300;
 }
 
 h6 {
-  @apply text-xs font-medium mb-1 text-gray-600;
+  @apply text-xs font-medium mb-1 text-gray-600 dark:text-gray-400;
 }
 
 main ul {
@@ -237,5 +246,5 @@ main li {
 }
 
 blockquote {
-  @apply ml-4 my-1 border-l-4 border-orange-600 pl-3 pt-2 pb-1 bg-orange-50 italic text-gray-700 rounded;
+  @apply ml-4 my-1 border-l-4 border-orange-600 dark:border-orange-500 pl-3 pt-2 pb-1 bg-orange-50 dark:bg-orange-900/30 italic text-gray-700 dark:text-gray-300 rounded;
 }
