@@ -48,8 +48,6 @@ endpoints.
 
 ### IPv6 Connectivity
 
-> **This section is a work in progress.** More content coming soon™.
-
 You will find information on [ingress](@/ingress.md) traffic -- that is, allowing IPv6 clients to
 connect to your services ...
 

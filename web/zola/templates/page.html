@@ -8,6 +8,24 @@
     </div>
   {% else %}
     <div class="max-w-prose mx-auto">
+      {% if page.toc %}
+      <details class="toc mb-6 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <summary class="cursor-pointer font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">Table of Contents</summary>
+        <ul class="mt-3 space-y-1 text-sm">
+        {% for h1 in page.toc %}
+          <li><a href="{{ h1.permalink | safe }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ h1.title }}</a>
+            {% if h1.children %}
+            <ul class="ml-4 mt-1 space-y-1">
+              {% for h2 in h1.children %}
+              <li><a href="{{ h2.permalink | safe }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ h2.title }}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </li>
+        {% endfor %}
+        </ul>
+      </details>
+      {% endif %}
       {{ page.content | safe }}
     </div>
   {% endif %}
