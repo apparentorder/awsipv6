@@ -2,7 +2,6 @@ __pycache__
 node_modules
 output
 *.swp
-package-lock.json
 __pycache__
 .pytest_cache
 .pydep
