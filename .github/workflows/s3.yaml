@@ -16,7 +16,7 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v7
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: arn:aws:iam::329261680777:role/awsipv6-github
           role-session-name: github-action-awsipv6-build
