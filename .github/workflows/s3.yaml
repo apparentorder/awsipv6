@@ -16,7 +16,7 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v7
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::329261680777:role/awsipv6-github
           role-session-name: github-action-awsipv6-build
@@ -24,7 +24,7 @@ jobs:
           aws-region: eu-west-1
       - name: install stuff
         run: |
-          npm install
+          npm ci
           python3 -m venv .venv
           source .venv/bin/activate
           pip install -r update-data/requirements.txt
