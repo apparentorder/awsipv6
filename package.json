@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@tailwindcss/cli": "^4.3.3",
-    "aws-cdk": "^2.1141.0",
+    "aws-cdk": "^2.1142.0",
     "htmx.org": "^2.0.10",
     "sql.js": "^1.14.2"
   }
