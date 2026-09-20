@@ -4,7 +4,7 @@
 set -e
 
 S3BASE="s3://awsipv6/beta"
-URLBASE="https://awsipv6.neveragain.de/beta"
+URLBASE="https://awsipv6.dkinfra.de/beta"
 LIVE_ARG=""
 SKIP_GET=0
 
@@ -15,7 +15,7 @@ export AWS_DEFAULT_REGION=eu-west-1
 if test "$1" = "--live"; then
     S3BASE="s3://awsipv6"
     LIVE_ARG="--live"
-    URLBASE="https://awsipv6.neveragain.de"
+    URLBASE="https://awsipv6.dkinfra.de"
     shift
 fi
 
