@@ -3,7 +3,7 @@
 
 set -e
 
-URLBASE="${1:-https://awsipv6.neveragain.de/beta}"
+URLBASE="${1:-https://awsipv6.dkinfra.de/beta}"
 
 # Build Tailwind CSS
 npx tailwindcss -i web/misc/uglyshit.tailwind -o web/zola/static/assets/uglyshit.css
