@@ -1,5 +1,5 @@
 User-agent: *    
 Allow: /
 
-Sitemap: https://awsipv6.neveragain.de/sitemap.xml
+Sitemap: https://awsipv6.dkinfra.de/sitemap.xml
 
