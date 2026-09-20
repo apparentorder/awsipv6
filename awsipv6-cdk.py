@@ -17,6 +17,7 @@ class Awsipv6CertStack(cdk.Stack):
 
         self.cert = acm.Certificate(self, f"Awsipv6Certificate",
             domain_name = "awsipv6.neveragain.de",
+            subject_alternative_names = ["awsipv6.dkinfra.de"],
             validation = acm.CertificateValidation.from_dns(), # manual
         )
 
@@ -57,7 +58,7 @@ class Awsipv6CdnStack(cdk.Stack):
 
         cf_distribution = cloudfront.Distribution(self, f"Awsipv6Distribution",
             comment = "Awsipv6",
-            domain_names = ["awsipv6.neveragain.de"],
+            domain_names = ["awsipv6.neveragain.de", "awsipv6.dkinfra.de"],
             certificate = cf_certificate,
             enable_ipv6 = True,
             # default_root_object = "awsipv6-main",
